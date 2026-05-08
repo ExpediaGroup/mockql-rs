@@ -1,0 +1,3 @@
+[hooks]
+pre-commit = "cargo xtask fmt"
+pre-push = "cargo xtask lint"

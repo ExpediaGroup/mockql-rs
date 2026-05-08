@@ -1,0 +1,22 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/different_levels/not_nested.graphql
+---
+query ComplexQuery {
+  topProducts(first: 10) @mock(hint: "popular products") {
+    upc
+    name
+  }
+  recommendedProducts {
+    reviewsForAuthor(authorID: 14) @mock(hint: "reviews by author") {
+      id
+      body
+    }
+  }
+  me {
+    username @mock(hint: "unique username")
+    reviews {
+      body @mock(hint: "a rant review")
+    }
+  }
+}

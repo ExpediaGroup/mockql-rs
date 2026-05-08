@@ -1,0 +1,8 @@
+query {
+  me {
+    ... on User {
+      name
+      reviews { body }
+    }
+  }
+}

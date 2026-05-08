@@ -1,0 +1,25 @@
+[package]
+name = "mockql-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+apollo-compiler.workspace = true
+buildstructor.workspace = true
+cynic.workspace = true
+cynic-introspection.workspace = true
+regex.workspace = true
+reqwest.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_json_bytes.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+toon-format.workspace = true
+
+[dev-dependencies]
+insta.workspace = true

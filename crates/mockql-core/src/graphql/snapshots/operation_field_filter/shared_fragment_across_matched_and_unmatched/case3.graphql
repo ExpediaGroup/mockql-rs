@@ -1,0 +1,21 @@
+# mock_paths: ["topProducts.reviews", "topProducts.reviews.body", "recommendedProducts.reviews.body"]
+query GetProducts {
+  topProducts(first: 5) {
+    name
+    reviews @mock(hint: "positive reviews") {
+      ...ReviewFields
+    }
+  }
+  recommendedProducts {
+    name
+    reviews {
+      ...ReviewFields
+    }
+  }
+}
+
+fragment ReviewFields on Review {
+  id
+  body @mock(hint: "summarize")
+  rating
+}

@@ -1,0 +1,8 @@
+# operation_name: GetProducts
+query GetProducts {
+  topProducts(first: 5) {
+    upc
+    name
+    reviews { id body }
+  }
+}

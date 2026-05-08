@@ -1,0 +1,26 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/nested_fragment_spreads/operation.graphql
+---
+query GetUserReviews {
+  me {
+    id
+    name
+    ...UserReviews
+  }
+}
+
+fragment UserReviews on User {
+  reviews {
+    id
+    ...ReviewProduct
+  }
+}
+
+fragment ReviewProduct on Review {
+  rating
+  product {
+    upc
+    price
+  }
+}

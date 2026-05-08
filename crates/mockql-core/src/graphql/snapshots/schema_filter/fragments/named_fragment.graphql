@@ -1,0 +1,10 @@
+query {
+  me {
+    ...UserFields
+  }
+}
+fragment UserFields on User {
+  id
+  name
+  username
+}

@@ -1,0 +1,9 @@
+query {
+  topProducts(first: 5) {
+    reviews @mock {
+      id
+      body
+      author { name }
+    }
+  }
+}

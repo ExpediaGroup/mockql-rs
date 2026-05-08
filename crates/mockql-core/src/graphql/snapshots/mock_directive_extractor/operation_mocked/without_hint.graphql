@@ -1,0 +1,4 @@
+# operation_name: GetInfo
+query GetInfo @mock {
+  me { id name }
+}

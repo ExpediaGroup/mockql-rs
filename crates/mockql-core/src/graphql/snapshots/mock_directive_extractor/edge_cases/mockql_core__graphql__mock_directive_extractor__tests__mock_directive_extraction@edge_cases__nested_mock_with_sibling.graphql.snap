@@ -1,0 +1,18 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/nested_mock_with_sibling.graphql
+---
+{
+  "type": "PartialMocked",
+  "data": {
+    "document": "{ topProducts(first: 5) { upc reviews @mock { body } } }",
+    "mocked_fields": [
+      {
+        "path": "topProducts.reviews",
+        "hint": null,
+        "return_type": "Review"
+      }
+    ]
+  }
+}

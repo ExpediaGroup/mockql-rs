@@ -1,0 +1,19 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/different_levels/nested.graphql
+---
+{
+  me @mock {
+    id
+    name @mock(hint: "celebrity name")
+    username @mock(hint: "unique username")
+    reviews @mock {
+      id
+      body
+    }
+  }
+  topProducts(first: 5) @mock(hint: "popular products") {
+    name
+    upc @mock(hint: "identifier starting with prd-")
+  }
+}

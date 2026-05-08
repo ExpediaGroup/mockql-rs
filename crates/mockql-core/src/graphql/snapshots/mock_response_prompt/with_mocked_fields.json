@@ -1,0 +1,20 @@
+{
+  "graphql_schema": "Query: T:Query:me:User\nUser: T:User:id:d!,profile:Profile\nProfile: T:Profile:displayName:s,bio:s",
+  "graphql_operation": "query Me($userId: ID!, $includeProfile: Boolean!) {\n  me(id: $userId) {\n    id\n    profile @include(if: $includeProfile) {\n      displayName @mock(hint: \"Use a realistic full name\")\n      bio @mock\n    }\n  }\n}",
+  "variables": {
+    "userId": "123",
+    "includeProfile": true
+  },
+  "mocked_fields": [
+    {
+      "path": "me.profile.displayName",
+      "hint": "Use a realistic full name",
+      "return_type": "String"
+    },
+    {
+      "path": "me.profile.bio",
+      "hint": null,
+      "return_type": "String"
+    }
+  ]
+}

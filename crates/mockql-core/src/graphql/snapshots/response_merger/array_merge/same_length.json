@@ -1,0 +1,47 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "name": "Ada Lovelace",
+        "reviews": [
+          {
+            "product": {
+              "name": "Table"
+            }
+          },
+          {
+            "product": {
+              "name": "Couch"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "reviews": [
+          {
+            "product": {
+              "reviews": [
+                {
+                  "body": "A sharp rant about wobbly table legs, late deliveries, and the kind of finish that chips if you look at it wrong."
+                }
+              ]
+            }
+          },
+          {
+            "product": {
+              "reviews": [
+                {
+                  "body": "A calmer note about comfort, fabric, and the way the couch settles after a long day."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

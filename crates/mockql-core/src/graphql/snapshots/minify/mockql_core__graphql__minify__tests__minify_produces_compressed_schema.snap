@@ -1,0 +1,28 @@
+---
+source: crates/mockql-core/src/graphql/minify.rs
+expression: minified_schema
+---
+__Schema: T:"AGraphQLSchemadefinesthecapabilitiesofaGraphQLserver.Itexposesallavailabletypesanddirectivesontheserver,aswellastheentrypointsforquery,mutation,andsubscriptionoperations."__Schema:description:s,"Alistofalltypessupportedbythisserver."types:[__Type!]!,"Thetypethatqueryoperationswillberootedat."queryType:__Type!,"Ifthisserversupportsmutation,thetypethatmutationoperationswillberootedat."mutationType:__Type,"Ifthisserversupportsubscription,thetypethatsubscriptionoperationswillberootedat."subscriptionType:__Type,"Alistofalldirectivessupportedbythisserver."directives:[__Directive!]!
+__Type: T:"ThefundamentalunitofanyGraphQLSchemaisthetype.TherearemanykindsoftypesinGraphQLasrepresentedbythe`__TypeKind`enum.Dependingonthekindofatype,certainfieldsdescribeinformationaboutthattype.Scalartypesprovidenoinformationbeyondaname,descriptionandoptional`specifiedByURL`,whileEnumtypesprovidetheirvalues.ObjectandInterfacetypesprovidethefieldstheydescribe.Abstracttypes,UnionandInterface,providetheObjecttypespossibleatruntime.ListandNonNulltypescomposeothertypes."__Type:kind:__TypeKind!,name:s,description:s,fields(includeDeprecated:b):[__Field!],interfaces:[__Type!],possibleTypes:[__Type!],enumValues(includeDeprecated:b):[__EnumValue!],inputFields(includeDeprecated:b):[__InputValue!],ofType:__Type,specifiedByURL:s
+__TypeKind: E:"Anenumdescribingwhatkindoftypeagiven`__Type`is."__TypeKind:SCALAR,OBJECT,INTERFACE,UNION,ENUM,INPUT_OBJECT,LIST,NON_NULL
+__Field: T:"ObjectandInterfacetypesaredescribedbyalistofFields,eachofwhichhasaname,potentiallyalistofarguments,andareturntype."__Field:name:s!,description:s,args(includeDeprecated:b):[__InputValue!]!,type:__Type!,isDeprecated:b!,deprecationReason:s
+__InputValue: T:"ArgumentsprovidedtoFieldsorDirectivesandtheinputfieldsofanInputObjectarerepresentedasInputValueswhichdescribetheirtypeandoptionallyadefaultvalue."__InputValue:name:s!,description:s,type:__Type!,"AGraphQL-formattedstringrepresentingthedefaultvalueforthisinputvalue."defaultValue:s,isDeprecated:b!,deprecationReason:s
+__EnumValue: T:"OnepossiblevalueforagivenEnum.Enumvaluesareuniquevalues,notaplaceholderforastringornumericvalue.HoweveranEnumvalueisreturnedinaJSONresponseasastring."__EnumValue:name:s!,description:s,isDeprecated:b!,deprecationReason:s
+__Directive: T:"ADirectiveprovidesawaytodescribealternateruntimeexecutionandtypevalidationbehaviorinaGraphQLdocument.Insomecases,youneedtoprovideoptionstoalterGraphQL'sexecutionbehaviorinwaysfieldargumentswillnotsuffice,suchasconditionallyincludingorskippingafield.Directivesprovidethisbydescribingadditionalinformationtotheexecutor."__Directive:name:s!,description:s,locations:[__DirectiveLocation!]!,args(includeDeprecated:b):[__InputValue!]!,isRepeatable:b!
+__DirectiveLocation: E:"ADirectivecanbeadjacenttomanypartsoftheGraphQLlanguage,a__DirectiveLocationdescribesonesuchpossibleadjacencies."__DirectiveLocation:QUERY,MUTATION,SUBSCRIPTION,FIELD,FRAGMENT_DEFINITION,FRAGMENT_SPREAD,INLINE_FRAGMENT,VARIABLE_DEFINITION,SCHEMA,SCALAR,OBJECT,FIELD_DEFINITION,ARGUMENT_DEFINITION,INTERFACE,UNION,ENUM,ENUM_VALUE,INPUT_OBJECT,INPUT_FIELD_DEFINITION
+Int: i
+Float: f
+String: s
+Boolean: b
+ID: d
+UserStatus: E:UserStatus:ACTIVE,INACTIVE,PENDING
+Category: E:Category:TECH,SPORTS,NEWS
+Node: F:Node:id:d!,createdAt:s!
+Reviewable: F:Reviewable:reviews:[Review],averageRating:f
+Mutation: T:Mutation:createProduct(upc:d!,name:s):Product,createReview(upc:d!,id:d!,body:s):Review
+Post: T:Post:id:d!,title:s!,content:s!,author:User,category:Category
+Product: T:Product<Node,Reviewable>:id:d!,upc:s!,weight:i,price:i,inStock:b,shippingEstimate:i,name:s,reviews:[Review],reviewsForAuthor(authorID:d!):[Review],createdAt:s!,averageRating:f
+SearchResult: U:SearchResult:Product,Post,User
+Query: T:Query:me:User,recommendedProducts:[Product],topProducts(first:i):[Product],user(id:d!):User,post(id:d!):Post,node(id:d!):Node,search(query:s!):[SearchResult]
+Review: T:Review<Node>:id:d!,body:s,author:User,product:Product,createdAt:s!,rating:i
+User: T:User<Node>:id:d!,name:s,username:s,reviews:[Review],status:UserStatus,createdAt:s!,email:s,posts:[Post]

@@ -1,0 +1,4 @@
+query {
+  me @mock(hint: "current user") { id name }
+  topProducts(first: 5) @mock(hint: "popular products") { name upc }
+}

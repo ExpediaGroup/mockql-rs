@@ -1,0 +1,9 @@
+query GetUserWithReviews {
+  me {
+    id
+    reviews {
+      id
+      body
+    }
+  }
+}

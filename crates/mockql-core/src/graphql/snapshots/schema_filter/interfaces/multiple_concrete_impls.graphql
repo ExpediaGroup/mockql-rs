@@ -1,0 +1,10 @@
+query {
+  node(id: "1") {
+    ... on User {
+      createdAt
+    }
+    ... on Review {
+      id
+    }
+  }
+}

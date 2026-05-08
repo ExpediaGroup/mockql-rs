@@ -1,0 +1,82 @@
+directive @mock(hint: String) on QUERY | MUTATION | FIELD
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    PENDING
+}
+
+enum Category {
+    TECH
+    SPORTS
+    NEWS
+}
+
+interface Node {
+    id: ID!
+    createdAt: String!
+}
+
+interface Reviewable {
+    reviews: [Review]
+    averageRating: Float
+}
+
+type Mutation {
+    createProduct(upc: ID!, name: String): Product
+    createReview(upc: ID!, id: ID!, body: String): Review
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+    author: User
+    category: Category
+}
+
+type Product implements Node & Reviewable {
+    id: ID!
+    upc: String!
+    weight: Int
+    price: Int
+    inStock: Boolean
+    shippingEstimate: Int
+    name: String
+    reviews: [Review]
+    reviewsForAuthor(authorID: ID!): [Review]
+    createdAt: String!
+    averageRating: Float
+}
+
+union SearchResult = Product | Post | User
+
+type Query {
+    me: User
+    recommendedProducts: [Product]
+    topProducts(first: Int = 5): [Product]
+    user(id: ID!): User
+    post(id: ID!): Post
+    node(id: ID!): Node
+    search(query: String!): [SearchResult]
+}
+
+type Review implements Node {
+    id: ID!
+    body: String
+    author: User
+    product: Product
+    createdAt: String!
+    rating: Int
+}
+
+type User implements Node {
+    id: ID!
+    name: String
+    username: String
+    reviews: [Review]
+    status: UserStatus
+    createdAt: String!
+    email: String
+    posts: [Post]
+}

@@ -1,0 +1,6 @@
+query {
+  topProducts(first: 5) {
+    __typename
+    reviews @mock { body }
+  }
+}

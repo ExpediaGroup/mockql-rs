@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  RUST_VERSION: "1.95.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os-name }}-${{ matrix.arch-name }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            os-name: darwin
+            arch-name: arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: ${{ matrix.target }}
+
+      - name: Install Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.target }}
+
+      - name: Compile dependencies
+        run: |
+          echo '' > crates/mockql-core/src/lib.rs
+          echo 'fn main() {}' > crates/mockql-cli/src/main.rs
+          echo 'fn main() {}' > xtask/src/main.rs
+          cargo build --release --target ${{ matrix.target }}
+          git checkout .
+
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package binary
+        run: |
+          ARCHIVE_NAME="mockql-rs-${{ github.event.release.tag_name }}-${{ matrix.os-name }}-${{ matrix.arch-name }}"
+          mkdir -p "${ARCHIVE_NAME}"
+          cp target/${{ matrix.target }}/release/mockql "${ARCHIVE_NAME}/"
+          zip -r "${ARCHIVE_NAME}.zip" "${ARCHIVE_NAME}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mockql-rs-${{ matrix.os-name }}-${{ matrix.arch-name }}
+          path: "*.zip"
+
+  release:
+    name: Upload to GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Upload binaries to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+
+      # - name: Publish to crates.io
+      #   env:
+      #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      #   run: |
+      #     cargo publish -p mockql-core
+      #     cargo publish -p mockql

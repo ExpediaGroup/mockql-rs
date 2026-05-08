@@ -1,0 +1,21 @@
+{
+  "into": {
+    "data": {
+      "person": {
+        "id": "cGVvcGxlOjE=",
+        "name": "Luke Skywalker",
+        "friends": null
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "person": {
+        "friends": [
+          { "name": "Han Solo" },
+          { "name": "Leia Organa" }
+        ]
+      }
+    }
+  }
+}

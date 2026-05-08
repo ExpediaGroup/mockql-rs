@@ -1,0 +1,8 @@
+query {
+  me {
+    reviews {
+      id @mock(hint: "review id")
+      body @mock(hint: "review body")
+    }
+  }
+}

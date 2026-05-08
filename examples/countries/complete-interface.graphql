@@ -1,0 +1,13 @@
+query GetContinent($code: ID!) {
+  continent(code: $code) @mock {
+    name
+    countries {
+      name
+      emoji
+      languages {
+        name
+        native
+      }
+    }
+  }
+}

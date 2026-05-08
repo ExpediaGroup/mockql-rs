@@ -1,0 +1,16 @@
+# mock_paths: ["topProducts.reviews"]
+# operation_name: GetProducts
+query GetProducts {
+  topProducts(first: 5) {
+    ...ProductInfo
+  }
+}
+
+fragment ProductInfo on Product {
+  name
+  price
+  reviews @mock(hint: "positive reviews") {
+    id
+    body
+  }
+}

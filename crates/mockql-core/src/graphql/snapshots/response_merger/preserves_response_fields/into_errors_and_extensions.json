@@ -1,0 +1,28 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1",
+        "name": "Ada"
+      }
+    },
+    "errors": [
+      {
+        "message": "Could not resolve field `email`",
+        "path": ["me", "email"]
+      }
+    ],
+    "extensions": {
+      "tracing": {
+        "version": 1
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "username": "mock_user_42"
+      }
+    }
+  }
+}
