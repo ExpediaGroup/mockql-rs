@@ -1,0 +1,19 @@
+{
+  "graphql_schema": "T:Query:me:User\nT:User:id:d!,name:s,email:s",
+  "graphql_operation": "{ me { id name email } }",
+  "variables": {},
+  "mocked_fields": [
+    {
+      "path": "me.email",
+      "hint": "Use a work email",
+      "return_type": "String"
+    }
+  ],
+  "format": "toon",
+  "partial_response": {
+    "me": {
+      "id": "usr-123",
+      "name": "Alice Johnson"
+    }
+  }
+}

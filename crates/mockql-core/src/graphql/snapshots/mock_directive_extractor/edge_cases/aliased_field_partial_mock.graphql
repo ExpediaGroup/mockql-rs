@@ -1,0 +1,4 @@
+query {
+  mocked: topProducts @mock(hint: "give me products") { name }
+  notMocked: topProducts { name }
+}

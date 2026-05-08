@@ -1,0 +1,12 @@
+# operation_name: GetUser
+query GetUser {
+  me {
+    id
+    name @mock(hint: "celebrity name")
+    username @mock(hint: "unique username")
+    reviews @mock {
+      id
+      body
+    }
+  }
+}

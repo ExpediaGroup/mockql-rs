@@ -1,0 +1,24 @@
+---
+source: crates/mockql-core/src/graphql/schema_filter.rs
+expression: "SCHEMA_FILTER.filter(&content,\noperation_name.as_deref()).expect(\"filter should succeed\")"
+input_file: crates/mockql-core/src/graphql/snapshots/schema_filter/unions/single_member.graphql
+---
+interface Node {
+  id: ID!
+  createdAt: String!
+}
+type Product implements Node & Reviewable {
+  name: String
+}
+type Query {
+  search(query: String!): [SearchResult]
+}
+interface Reviewable {
+  reviews: [Review]
+  averageRating: Float
+}
+union SearchResult = Product
+"""
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+"""
+scalar String

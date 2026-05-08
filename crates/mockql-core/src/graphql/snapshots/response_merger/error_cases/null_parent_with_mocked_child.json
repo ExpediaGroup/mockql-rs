@@ -1,0 +1,20 @@
+{
+  "into": {
+    "data": {
+      "person": {
+        "id": "cGVvcGxlOjE=",
+        "name": "Luke Skywalker",
+        "homeworld": null
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "person": {
+        "homeworld": {
+          "climates": "dry desert frontier"
+        }
+      }
+    }
+  }
+}

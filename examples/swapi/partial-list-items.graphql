@@ -1,0 +1,9 @@
+query AllFilms {
+  allFilms {
+    films {
+      title
+      openingCrawl @mock(hint: "A long time ago, in a galaxy far, far away... complete it with real opening crawl of the film")
+      director @mock(hint: "Real director of the film")
+    }
+  }
+}

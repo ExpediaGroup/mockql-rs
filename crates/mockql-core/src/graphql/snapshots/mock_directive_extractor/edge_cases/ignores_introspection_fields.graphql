@@ -1,0 +1,4 @@
+query {
+  __typename
+  me @mock { id name }
+}

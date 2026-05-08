@@ -1,0 +1,10 @@
+{
+  "into": {
+    "data": "not a valid graphql response"
+  },
+  "from": {
+    "data": {
+      "name": "Alice"
+    }
+  }
+}

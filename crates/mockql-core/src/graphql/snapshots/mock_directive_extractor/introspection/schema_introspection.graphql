@@ -1,0 +1,19 @@
+query IntrospectionQuery {
+  __schema {
+    queryType { name }
+    mutationType { name }
+    types {
+      name
+      kind
+      fields {
+        name
+        type { name kind ofType { name kind } }
+      }
+    }
+    directives {
+      name
+      locations
+      args { name type { name kind } }
+    }
+  }
+}

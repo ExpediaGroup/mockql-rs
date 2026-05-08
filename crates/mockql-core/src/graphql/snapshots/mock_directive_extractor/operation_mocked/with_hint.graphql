@@ -1,0 +1,5 @@
+# operation_name: GetInfo
+query GetInfo @mock(hint: "test data for development") {
+  me { id name }
+  topProducts(first: 5) { name upc }
+}

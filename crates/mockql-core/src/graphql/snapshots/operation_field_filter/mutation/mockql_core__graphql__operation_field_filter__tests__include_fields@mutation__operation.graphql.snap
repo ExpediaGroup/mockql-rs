@@ -1,0 +1,10 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/mutation/operation.graphql
+---
+mutation CreateReview {
+  createReview(upc: "1", id: "100", body: "Great product!") {
+    body @mock(hint: "review body")
+    rating @mock(hint: "5 stars")
+  }
+}

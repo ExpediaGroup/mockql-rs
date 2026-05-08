@@ -1,0 +1,4 @@
+query {
+  nonExistentField @mock { id }
+  me { id name }
+}

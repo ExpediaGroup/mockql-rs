@@ -1,0 +1,23 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/aliased_fields_all_mocked.graphql
+---
+{
+  "type": "AllTopLevelFieldsMocked",
+  "data": {
+    "document": "{ first: topProducts @mock(hint: \"first batch\") { name } second: topProducts @mock(hint: \"second batch\") { name } }",
+    "mocked_fields": [
+      {
+        "path": "first",
+        "hint": "first batch",
+        "return_type": "Product"
+      },
+      {
+        "path": "second",
+        "hint": "second batch",
+        "return_type": "Product"
+      }
+    ]
+  }
+}

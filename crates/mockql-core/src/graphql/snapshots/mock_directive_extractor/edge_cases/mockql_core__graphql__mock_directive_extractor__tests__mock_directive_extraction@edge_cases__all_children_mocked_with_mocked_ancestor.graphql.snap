@@ -1,0 +1,28 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/all_children_mocked_with_mocked_ancestor.graphql
+---
+{
+  "type": "AllTopLevelFieldsMocked",
+  "data": {
+    "document": "{ me @mock(hint: \"mock user\") { reviews { id @mock(hint: \"review id\") body @mock(hint: \"review body\") } } }",
+    "mocked_fields": [
+      {
+        "path": "me.reviews.id",
+        "hint": "review id",
+        "return_type": "ID"
+      },
+      {
+        "path": "me.reviews.body",
+        "hint": "review body",
+        "return_type": "String"
+      },
+      {
+        "path": "me",
+        "hint": "mock user",
+        "return_type": "User"
+      }
+    ]
+  }
+}

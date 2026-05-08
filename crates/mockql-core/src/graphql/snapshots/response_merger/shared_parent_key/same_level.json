@@ -1,0 +1,23 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1"
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "name": "Celebrity",
+        "username": "celeb123",
+        "reviews": [
+          {
+            "id": "r1",
+            "body": "Great!"
+          }
+        ]
+      }
+    }
+  }
+}

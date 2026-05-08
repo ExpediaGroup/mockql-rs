@@ -1,0 +1,15 @@
+# mock_paths: ["topProducts.name", "recommendedProducts.name"]
+fragment ProductFragment on Product {
+    id
+    name @mock
+    price
+}
+
+query GetProducts {
+    topProducts {
+        ...ProductFragment
+    }
+    recommendedProducts {
+        ...ProductFragment
+    }
+}

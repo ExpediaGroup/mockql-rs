@@ -1,0 +1,5 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/error_cases/null_parent_with_mocked_child_array.json
+---
+NonMergeableKeys { path: "person.friends", details: "Upstream GraphQL response returned null for this field, cannot merge mocked array into null" }

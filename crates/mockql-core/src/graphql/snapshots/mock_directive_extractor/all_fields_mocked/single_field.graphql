@@ -1,0 +1,7 @@
+query {
+  me @mock(hint: "mock current user") {
+    id
+    name
+    reviews { body }
+  }
+}

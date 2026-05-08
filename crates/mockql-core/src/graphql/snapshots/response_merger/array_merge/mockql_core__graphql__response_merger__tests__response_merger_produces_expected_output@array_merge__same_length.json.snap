@@ -1,0 +1,33 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/array_merge/same_length.json
+---
+{
+  "data": {
+    "me": {
+      "name": "Ada Lovelace",
+      "reviews": [
+        {
+          "product": {
+            "name": "Table",
+            "reviews": [
+              {
+                "body": "A sharp rant about wobbly table legs, late deliveries, and the kind of finish that chips if you look at it wrong."
+              }
+            ]
+          }
+        },
+        {
+          "product": {
+            "name": "Couch",
+            "reviews": [
+              {
+                "body": "A calmer note about comfort, fabric, and the way the couch settles after a long day."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

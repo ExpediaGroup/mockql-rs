@@ -1,0 +1,20 @@
+{
+  "into": {
+    "data": {
+      "createReview": {
+        "id": "100",
+        "author": {
+          "name": "Ada"
+        }
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "createReview": {
+        "body": "Great product!",
+        "rating": 5
+      }
+    }
+  }
+}

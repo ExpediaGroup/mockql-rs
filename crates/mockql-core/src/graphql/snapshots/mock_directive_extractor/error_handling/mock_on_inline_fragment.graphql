@@ -1,0 +1,9 @@
+query GetProducts {
+  topProducts(first: 5) {
+    upc
+    ... on Product @mock {
+      name
+      price
+    }
+  }
+}

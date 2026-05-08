@@ -1,0 +1,10 @@
+query {
+  search(query: "test") {
+    ... on Product {
+      name
+    }
+    ... on User {
+      name
+    }
+  }
+}

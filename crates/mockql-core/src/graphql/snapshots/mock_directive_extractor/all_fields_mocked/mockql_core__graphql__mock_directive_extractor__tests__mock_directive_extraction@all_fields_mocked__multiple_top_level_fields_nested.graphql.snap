@@ -1,0 +1,43 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/all_fields_mocked/multiple_top_level_fields_nested.graphql
+---
+{
+  "type": "AllTopLevelFieldsMocked",
+  "data": {
+    "document": "{ me @mock { id name @mock(hint: \"celebrity name\") username @mock(hint: \"unique username\") reviews @mock { id body } } topProducts(first: 5) @mock(hint: \"popular products\") { name upc @mock(hint: \"identifier starting with prd-\") } }",
+    "mocked_fields": [
+      {
+        "path": "me.name",
+        "hint": "celebrity name",
+        "return_type": "String"
+      },
+      {
+        "path": "me.username",
+        "hint": "unique username",
+        "return_type": "String"
+      },
+      {
+        "path": "me.reviews",
+        "hint": null,
+        "return_type": "Review"
+      },
+      {
+        "path": "me",
+        "hint": null,
+        "return_type": "User"
+      },
+      {
+        "path": "topProducts.upc",
+        "hint": "identifier starting with prd-",
+        "return_type": "String"
+      },
+      {
+        "path": "topProducts",
+        "hint": "popular products",
+        "return_type": "Product"
+      }
+    ]
+  }
+}

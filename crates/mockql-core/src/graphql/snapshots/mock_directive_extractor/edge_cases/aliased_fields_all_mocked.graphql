@@ -1,0 +1,4 @@
+query {
+  first: topProducts @mock(hint: "first batch") { name }
+  second: topProducts @mock(hint: "second batch") { name }
+}

@@ -1,0 +1,32 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1"
+      }
+    },
+    "extensions": {
+      "tracing": {
+        "version": 1
+      },
+      "cacheControl": {
+        "maxAge": 300
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "username": "ada42"
+      }
+    },
+    "extensions": {
+      "tracing": {
+        "version": 999
+      },
+      "costEstimate": {
+        "total": 5
+      }
+    }
+  }
+}

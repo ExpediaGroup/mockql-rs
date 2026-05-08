@@ -1,0 +1,23 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/preserves_response_fields/both_have_extensions.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "username": "ada42"
+    }
+  },
+  "extensions": {
+    "tracing": {
+      "version": 1
+    },
+    "cacheControl": {
+      "maxAge": 300
+    },
+    "costEstimate": {
+      "total": 5
+    }
+  }
+}

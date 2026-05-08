@@ -1,0 +1,5 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/error_cases/object_vs_scalar_collision.json
+---
+NonMergeableKeys { path: "me", details: "values cannot be merged (into: object, from: string)" }
