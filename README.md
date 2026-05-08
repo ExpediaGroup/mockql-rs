@@ -8,7 +8,7 @@ The `@mock` directive specification lives in [`docs/mock-specification.md`](./do
 
 ## 🎯 What It Does
 
-`mockql` lets you annotate a GraphQL operation with `@mock` and generate only the mocked portions with an LLM provider. 
+`mockql` lets you annotate a GraphQL operation with `@mock` and generate only the mocked portions with an LLM provider.
 The upstream GraphQL server does not need to define the `@mock` directive. `mockql` decorates the schema with it automatically while loading it (locally or via introspection).
 
 Depending on where `@mock` appears, `mockql` will:
@@ -171,3 +171,4 @@ For more example commands, see:
 
 - [`examples/swapi/README.md`](./examples/swapi/README.md)
 - [`examples/countries/README.md`](./examples/countries/README.md)
+  =======
