@@ -17,3 +17,4 @@ prompt.dbg.txt
 
 # .lldb debug alias
 .lldbinit
+megalinter-reports/
