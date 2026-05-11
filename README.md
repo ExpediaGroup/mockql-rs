@@ -171,4 +171,3 @@ For more example commands, see:
 
 - [`examples/swapi/README.md`](./examples/swapi/README.md)
 - [`examples/countries/README.md`](./examples/countries/README.md)
-  =======
