@@ -18,9 +18,6 @@ ENABLE_LINTERS:
   - JSON_JSONLINT
   - REPOSITORY_GITLEAKS
 
-DISABLE:
-  - COPYPASTE
-
 SHOW_ELAPSED_TIME: true
 
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
