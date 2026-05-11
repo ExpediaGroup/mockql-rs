@@ -19,7 +19,6 @@ ENABLE_LINTERS:
   - REPOSITORY_GITLEAKS
 
 SHOW_ELAPSED_TIME: true
-VALIDATE_ALL_CODEBASE: true
 
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
