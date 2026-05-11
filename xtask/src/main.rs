@@ -32,6 +32,7 @@ struct XTask {
 enum Command {
   Lint,
   Fmt,
+  Test,
 }
 
 fn main() -> Result<()> {
@@ -43,6 +44,7 @@ impl XTask {
     match self.command {
       Command::Lint => exec_lint(),
       Command::Fmt => exec_fmt(),
+      Command::Test => exec_test(),
     }
   }
 }
@@ -58,5 +60,11 @@ fn exec_lint() -> Result<()> {
 fn exec_fmt() -> Result<()> {
   let sh = Shell::new()?;
   cmd!(sh, "cargo fmt --all").run()?;
+  Ok(())
+}
+
+fn exec_test() -> Result<()> {
+  let sh = Shell::new()?;
+  cmd!(sh, "cargo test --workspace --all-features").run()?;
   Ok(())
 }
