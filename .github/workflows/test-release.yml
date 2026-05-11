@@ -100,9 +100,9 @@ jobs:
 
       - name: Create checksums
         run: |
-          sha256sum *.tar.gz > sha256sums.txt
-          sha1sum *.tar.gz > sha1sums.txt
-          md5sum *.tar.gz > md5sums.txt
+          sha256sum ./*.tar.gz > sha256sums.txt
+          sha1sum ./*.tar.gz > sha1sums.txt
+          md5sum ./*.tar.gz > md5sums.txt
 
       - name: Create GitHub release
         env:
@@ -114,7 +114,7 @@ jobs:
             --title "${VERSION}" \
             --target "${{ github.sha }}" \
             --notes "" \
-            *.tar.gz \
+            ./*.tar.gz \
             md5sums.txt \
             sha1sums.txt \
             sha256sums.txt
