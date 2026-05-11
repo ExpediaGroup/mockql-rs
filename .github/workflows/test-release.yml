@@ -110,6 +110,7 @@ jobs:
         run: |
           VERSION="v${{ inputs.version }}"
           gh release create "${VERSION}" \
+            --repo "${{ github.repository }}" \
             --title "${VERSION}" \
             --target "${{ github.sha }}" \
             --notes "" \
