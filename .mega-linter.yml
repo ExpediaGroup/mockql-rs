@@ -10,15 +10,16 @@ APPLY_FIXES: none
 # be disabled by default
 # ENABLE:
 
-# If you use ENABLE_LINTERS variable, all other linters will be disabled by
-# default
-# ENABLE_LINTERS:
-
-# DISABLE:
-  # - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
-  # - SPELL # Uncomment to disable checks of spelling mistakes
+# Keep MegaLinter focused on repository hygiene. Rust quality gates stay in the
+# Rust toolchain via cargo xtask lint/test.
+ENABLE_LINTERS:
+  - ACTION_ACTIONLINT
+  - YAML_YAMLLINT
+  - JSON_JSONLINT
+  - REPOSITORY_GITLEAKS
 
 SHOW_ELAPSED_TIME: true
+VALIDATE_ALL_CODEBASE: true
 
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
