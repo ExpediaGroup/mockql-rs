@@ -30,8 +30,11 @@ struct XTask {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+  /// Enforce formatting and run lints.
   Lint,
+  /// Fix formatting.
   Fmt,
+  /// Run tests.
   Test,
 }
 
@@ -52,8 +55,11 @@ impl XTask {
 fn exec_lint() -> Result<()> {
   let sh = Shell::new()?;
   cmd!(sh, "cargo fmt --all -- --check").run()?;
-  cmd!(sh, "cargo check --workspace").run()?;
-  cmd!(sh, "cargo clippy --all-targets --all-features -- -D warnings").run()?;
+  cmd!(
+    sh,
+    "cargo clippy --workspace --all-targets --all-features -- -D warnings"
+  )
+  .run()?;
   Ok(())
 }
 
