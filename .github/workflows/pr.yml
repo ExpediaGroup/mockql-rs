@@ -28,7 +28,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Lint
-        run: cargo run -p xtask -- lint
+        run: cargo xtask lint
 
       - name: Test
-        run: cargo run -p xtask -- test
+        run: cargo xtask test

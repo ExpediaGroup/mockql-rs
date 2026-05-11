@@ -14,6 +14,12 @@
 - `xtask/` — dev tasks
 - `docs/` — `@mock` spec, provider-cli docs
 
+## Dev Commands
+
+- `cargo xtask fmt` — make code pretty. Use before commit.
+- `cargo xtask lint` — check pretty, check compile, check clippy. Use before push.
+- `cargo xtask test` — run all tests. Use before PR.
+
 ## Architecture
 
 ```mermaid
