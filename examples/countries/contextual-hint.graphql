@@ -1,0 +1,9 @@
+query GetCountry($code: ID!) {
+  country(code: $code) {
+    code
+    name @mock(hint: "Mocklandia")
+    native @mock(hint: "Mockese")
+    emoji @mock(hint: "🚩")
+    capital @mock(hint: "Mockington DC")
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"data\":{\"allFilms\":{\"films\":[{\"openingCrawl\":\"It is a period of civil war. Rebel spaceships, striking from a hidden base, have won their first victory against the evil Galactic Empire.\",\"director\":\"George Lucas\"},{\"openingCrawl\":\"It is a dark time for the Rebellion. Although the Death Star has been destroyed, Imperial troops have driven the Rebel forces from their hidden base.\",\"director\":\"Irvin Kershner\"},{\"openingCrawl\":\"Luke Skywalker has returned to his home planet of Tatooine in an attempt to rescue his friend Han Solo from the clutches of the vile gangster Jabba the Hutt.\",\"director\":\"Richard Marquand\"},{\"openingCrawl\":\"Turmoil has engulfed the Galactic Republic. The taxation of trade routes to outlying star systems is in dispute.\",\"director\":\"George Lucas\"},{\"openingCrawl\":\"There is unrest in the Galactic Senate. Several thousand solar systems have declared their intentions to leave the Republic.\",\"director\":\"George Lucas\"},{\"openingCrawl\":\"War! The Republic is crumbling under attacks by the ruthless Sith Lord, Count Dooku. There are heroes on both sides. Evil is everywhere.\",\"director\":\"George Lucas\"}]}},\"extensions\":{\"mockResponse\":{\"reasoning\":\"Populated director and openingCrawl for the 6 Star Wars films provided in the partial response using real movie data.\"}}}",
+        "reasoning_opaque": "Cj4XvvKc2cDme/tg8d4nFJXTcmA1ECe+1irNWal/5L25PUMeodmeqTvdsLXXOS6ko1+jhICXTeIkcBmxPM6nJFFVnM5l5ugyufDrJiZ4cF039QAJjSmLoUfBjtMaxAYR829GAEJJ8YMZmJS6S3wfPWylIOrFGkojRm06YNmAYP081WMadsHpkKKeGypW+y96azexTF6FxRxeAUo2laYZrn7UHVkq21XXjJr5wq+G4rkHu5qCr139FWoEbAXQ3rYrKthL0t0xWNoPHma3VjsU9XDdRZ589GO1P2BqxbnFtX7+rwHC/KATpzkSswE2JxRSNnI5hAcNx1UmmB95SGLW2XfKUZcSP491RCGZUdxdlJD6m7CC9o1A8JrlNNCLGwTpPVHv/sYci6TUxMO+4Na9cOhBom80pFQTd+FX+uf3SBxatIuSmvS/3zb0xWBHF235/bLwb8kqgXk2OwDSDrzywVOtKprH//PA47niCFyWh9Quzs09GkZZ1Jih",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776568793,
+  "id": "10nkacibHfLWsbwPzrTQoQI",
+  "usage": {
+    "completion_tokens": 269,
+    "prompt_tokens": 1470,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1739,
+    "reasoning_tokens": 0
+  },
+  "model": "gemini-3-flash-preview"
+}

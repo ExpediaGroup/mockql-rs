@@ -1,0 +1,6 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{:?}\", error),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/error_handling/nested_mock_only_field_with_subselections.graphql
+---
+TraversalErrors(["All fields under 'topProducts' have @mock - this would leave an empty selection set after removal"])

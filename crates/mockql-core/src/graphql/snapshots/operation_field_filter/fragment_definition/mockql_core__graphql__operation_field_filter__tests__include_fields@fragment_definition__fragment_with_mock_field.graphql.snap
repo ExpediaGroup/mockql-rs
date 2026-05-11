@@ -1,0 +1,16 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/fragment_definition/fragment_with_mock_field.graphql
+---
+query GetProducts {
+  topProducts(first: 5) {
+    ...ProductInfo
+  }
+}
+
+fragment ProductInfo on Product {
+  reviews @mock(hint: "positive reviews") {
+    id
+    body
+  }
+}

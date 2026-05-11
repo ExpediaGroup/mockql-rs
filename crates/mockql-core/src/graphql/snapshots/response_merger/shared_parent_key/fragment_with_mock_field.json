@@ -1,0 +1,22 @@
+{
+  "into": {
+    "data": {
+      "product": {
+        "name": "Widget",
+        "price": 999
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "product": {
+        "reviews": [
+          {
+            "id": "r1",
+            "body": "Love it"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# mock_paths: ["node.name", "node.body"]
+query GetNode {
+  node(id: "1") {
+    id
+    ... on User {
+      name @mock(hint: "user name")
+      username
+    }
+    ... on Review {
+      body @mock(hint: "review body")
+      rating
+    }
+  }
+}

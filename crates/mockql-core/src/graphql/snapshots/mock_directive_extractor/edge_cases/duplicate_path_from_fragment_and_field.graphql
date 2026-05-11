@@ -1,0 +1,10 @@
+query {
+  me {
+    username @mock(hint: "direct field")
+    ...UserNameField
+  }
+}
+
+fragment UserNameField on User {
+  username @mock(hint: "via fragment")
+}

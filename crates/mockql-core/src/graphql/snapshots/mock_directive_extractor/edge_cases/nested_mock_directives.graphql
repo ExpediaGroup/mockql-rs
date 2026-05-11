@@ -1,0 +1,9 @@
+query {
+  topProducts(first: 5) @mock(hint: "popular products") {
+    upc
+    name
+    reviews @mock(hint: "positive reviews") {
+      body
+    }
+  }
+}

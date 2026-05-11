@@ -1,0 +1,19 @@
+{
+  "into": {
+    "data": {
+      "node": {
+        "id": "1",
+        "username": "ada42",
+        "rating": 5
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "node": {
+        "name": "Ada Lovelace",
+        "body": "Compelling review"
+      }
+    }
+  }
+}

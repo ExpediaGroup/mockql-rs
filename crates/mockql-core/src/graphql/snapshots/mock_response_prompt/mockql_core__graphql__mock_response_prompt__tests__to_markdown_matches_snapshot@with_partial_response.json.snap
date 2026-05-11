@@ -1,0 +1,80 @@
+---
+source: crates/mockql-core/src/graphql/mock_response_prompt.rs
+input_file: crates/mockql-core/src/graphql/snapshots/mock_response_prompt/with_partial_response.json
+---
+## GraphQL Mock Response Specification
+### Instructions
+You are a GraphQL mock response generator.
+
+You are given:
+- A GraphQL operation (query/mutation + fragments)
+- Variables
+- A GraphQL schema (minified)
+- A "Fields To Mock" list containing {path, hint, return_type, optional listLength}
+
+Task:
+1. Produce exactly ONE response: a single minified JSON object (no markdown, no extra text).
+2. The response MUST have this shape:
+   {"data": <root>, "extensions": {"mockResponse": {"reasoning": <string>}}}
+   - Do NOT include "errors" unless explicitly instructed to.
+3. "data" MUST match the operation selection set exactly:
+   - Include ONLY fields requested by the operation (including fragment fields).
+   - Do NOT include non-selected fields, even as null.
+   - Honor field aliases: if the operation uses `alias: field`, the JSON key MUST be `alias`.
+   - Include `__typename` ONLY where the operation requests it.
+     * For object fields, set `__typename` to that object type name.
+     * For union/interface fields, set `__typename` per the "Unions / Interfaces" rules below.
+4. Use Variables to populate behavior and realism where relevant (locale, currency, device, etc).
+
+Mock data rules:
+1. Nullability:
+   - If a selected field is non-null (`!`), do NOT return null. Use a plausible default instead.
+   - If a field is nullable, you MAY return null, but prefer realistic values unless the hint implies missing data.
+2. Lists:
+   - If `### Partial Response` includes a list at a mocked field or at any ancestor path of a mocked field, the generated list at that path MUST have the same number of items.
+   - Example: if mocking `me.reviews.body` and `### Partial Response` is `{"me":{"reviews":[{"id":"rev-1"},{"id":"rev-2"},{"id":"rev-3"}]}}`, the generated `me.reviews` list MUST contain 3 items, and `me.reviews[*].body` MUST be generated for each of those 3 items.
+3. Unions / Interfaces:
+   - When the operation uses inline fragments on a union/interface, choose `__typename` ONLY from the fragment-covered types.
+   - If multiple fragment-covered types exist, pick one that best matches the hint/domain.
+   - Do not invent union members not present in the operation fragments.
+   - If no fragment-covered concrete types are available, use the interface name as a fallback `__typename`.
+4. Enums:
+   - Use only values allowed by the schema.
+   - Prefer values consistent with Variables and hint/domain.
+5. Scalars and selection:
+   - String-like scalars (UUID, URL, Locale) must serialize as JSON strings.
+   - If the operation selects subfields under a field, that field MUST be an object in JSON (not a scalar).
+   - All string values MUST be single-line (no literal newline characters).
+6. Hints:
+   - Apply "Fields To Mock" hints by exact `path` match (dot-separated).
+   - If a path targets a list field, apply the hint to each list item at that path.
+   - The hint influences only that field’s generated content and its descendants.
+   - If hints exist in multiple places, "Fields To Mock" is the source of truth.
+7. Output constraints:
+   - Output must be valid JSON and minified (no pretty printing).
+   - Escape characters correctly (quotes, backslashes). No trailing commas.
+   - `extensions.mockResponse.reasoning` must be a single-line string <= 240 characters (no step-by-step).
+### Minified GraphQL Schema
+#### Notation
+T = type, I = input, E = enum, s = String, i = Int, b = Boolean, f = Float, ! = required, [] = list
+```
+T:Query:me:User
+T:User:id:d!,name:s,email:s
+```
+### GraphQL Operation
+```graphql
+{ me { id name email } }
+```
+### Variables
+```json
+{}
+```
+### Fields To Mock
+```json
+[{"path":"me.email","hint":"Use a work email","return_type":"String"}]
+```
+### Partial Response
+GraphQL response returned by the upstream GraphQL server. Use it for contextual mocks.
+```json
+{"me":{"id":"usr-123","name":"Alice Johnson"}}
+```

@@ -1,0 +1,11 @@
+query GetPost {
+  post(id: "1") {
+    id
+    title
+    category
+    author {
+      id
+      status
+    }
+  }
+}

@@ -1,0 +1,16 @@
+query GetFilm($id: ID!) {
+  film(id: $id) {
+    id
+    title
+    characterConnection(first: 3) {
+      characters {
+        id
+        name @mock(hint: "Jar Jar Binks (The Sith Lord)")
+        species @mock(hint: "Gungan (Special Force)") {
+          id
+          name
+        }
+      }
+    }
+  }
+}

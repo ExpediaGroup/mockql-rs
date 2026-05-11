@@ -1,0 +1,24 @@
+# mock_paths: ["me.name", "topProducts.reviews.body"]
+query Combined {
+  me {
+    ...UserInfo
+  }
+  topProducts(first: 3) {
+    ...ProductDetails
+  }
+}
+
+fragment UserInfo on User {
+  id
+  name @mock(hint: "user name")
+  username
+}
+
+fragment ProductDetails on Product {
+  upc
+  name
+  reviews {
+    id
+    body @mock(hint: "review text")
+  }
+}

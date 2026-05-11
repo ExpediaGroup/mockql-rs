@@ -1,0 +1,33 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/multiple_mocks_different_levels.graphql
+---
+{
+  "type": "PartialMocked",
+  "data": {
+    "document": "query ComplexQuery { topProducts(first: 10) @mock(hint: \"popular products\") { upc name } recommendedProducts { upc name reviewsForAuthor(authorID: 14) @mock(hint: \"reviews by author\") { id body } } me { id username @mock(hint: \"unique username\") reviews { id body @mock(hint: \"a rant review\") } } }",
+    "mocked_fields": [
+      {
+        "path": "topProducts",
+        "hint": "popular products",
+        "return_type": "Product"
+      },
+      {
+        "path": "recommendedProducts.reviewsForAuthor",
+        "hint": "reviews by author",
+        "return_type": "Review"
+      },
+      {
+        "path": "me.username",
+        "hint": "unique username",
+        "return_type": "String"
+      },
+      {
+        "path": "me.reviews.body",
+        "hint": "a rant review",
+        "return_type": "String"
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "type":"result",
+  "subtype":"success",
+  "is_error":false,
+  "duration_ms":11923,
+  "duration_api_ms":9879,
+  "num_turns":1,
+  "result":"{\"data\":{\"loyaltyRewards\":{\"additionalInformation\":[{\"title\":\"Platinum Member Benefits\",\"cards\":[{\"card\":{\"heading\":\"Enjoy complimentary room upgrades and late checkout at select properties\"}}],\"subtitles\":[{\"text\":\"Exclusive perks available with your Platinum status\",\"theme\":\"LOYALTY\"},{\"text\":\"Benefits apply to all eligible bookings made with your account\",\"theme\":\"SECONDARY\"}]}]}},\"extensions\":{\"mockResponse\":{\"reasoning\":\"Generated Platinum loyalty benefits with 1 additionalInformation item, 1 card, and 2 subtitle items per hint. Used LOYALTY and SECONDARY themes for rewards context.\"}}}",
+  "stop_reason":"end_turn",
+  "session_id":"3c4d8b06-c2af-45b8-8f82-1fbcc1ffff36",
+  "total_cost_usd":0.13082125,
+  "usage":{
+    "input_tokens":3,
+    "cache_creation_input_tokens":19409,
+    "cache_read_input_tokens":0,
+    "output_tokens":380,
+    "server_tool_use":{
+      "web_search_requests":0,
+      "web_fetch_requests":0
+    },
+    "service_tier":"standard",
+    "cache_creation":{
+      "ephemeral_1h_input_tokens":0,
+      "ephemeral_5m_input_tokens":19409
+    },
+    "inference_geo":"",
+    "iterations":[],
+    "speed":"standard"
+  },
+  "modelUsage":{
+    "global.anthropic.claude-opus-4-6-v1":{
+      "inputTokens":3,
+      "outputTokens":380,
+      "cacheReadInputTokens":0,
+      "cacheCreationInputTokens":19409,
+      "webSearchRequests":0,
+      "costUSD":0.13082125,
+      "contextWindow":200000,
+      "maxOutputTokens":64000
+    }
+  },
+  "permission_denials":[],
+  "fast_mode_state":"off",
+  "uuid":"2556f05a-2d7b-42a4-8ac0-21cf3caafb62"
+}

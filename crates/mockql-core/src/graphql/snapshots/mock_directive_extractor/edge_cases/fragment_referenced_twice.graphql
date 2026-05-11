@@ -1,0 +1,14 @@
+fragment ProductFragment on Product {
+    id
+    name @mock
+    price
+}
+
+query {
+    topProducts {
+        ...ProductFragment
+    }
+    recommendedProducts {
+        ...ProductFragment
+    }
+}

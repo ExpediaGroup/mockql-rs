@@ -1,0 +1,11 @@
+# mock_paths: ["createReview.body", "createReview.rating"]
+mutation CreateReview {
+  createReview(upc: "1", id: "100", body: "Great product!") {
+    id
+    body @mock(hint: "review body")
+    rating @mock(hint: "5 stars")
+    author {
+      name
+    }
+  }
+}

@@ -1,0 +1,18 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/aliased_field_partial_mock.graphql
+---
+{
+  "type": "PartialMocked",
+  "data": {
+    "document": "{ mocked: topProducts @mock(hint: \"give me products\") { name } notMocked: topProducts { name } }",
+    "mocked_fields": [
+      {
+        "path": "mocked",
+        "hint": "give me products",
+        "return_type": "Product"
+      }
+    ]
+  }
+}

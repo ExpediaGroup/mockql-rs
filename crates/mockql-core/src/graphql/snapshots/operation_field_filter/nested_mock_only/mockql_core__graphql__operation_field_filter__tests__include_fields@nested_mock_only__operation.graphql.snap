@@ -1,0 +1,11 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/nested_mock_only/operation.graphql
+---
+query GetUserReviews {
+  me {
+    reviews {
+      body @mock(hint: "entertaining review")
+    }
+  }
+}

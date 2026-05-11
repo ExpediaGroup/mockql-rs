@@ -1,0 +1,26 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/shared_fragment_across_matched_and_unmatched/case3.graphql
+---
+query GetProducts {
+  topProducts(first: 5) {
+    reviews @mock(hint: "positive reviews") {
+      ...ReviewFields
+    }
+  }
+  recommendedProducts {
+    reviews {
+      ...ReviewFields__0
+    }
+  }
+}
+
+fragment ReviewFields on Review {
+  id
+  body @mock(hint: "summarize")
+  rating
+}
+
+fragment ReviewFields__0 on Review {
+  body @mock(hint: "summarize")
+}

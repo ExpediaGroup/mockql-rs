@@ -1,0 +1,25 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/multiple_fragments/operation.graphql
+---
+query Combined {
+  me {
+    ...UserInfo
+  }
+  topProducts(first: 3) {
+    ...ProductDetails
+  }
+}
+
+fragment UserInfo on User {
+  id
+  username
+}
+
+fragment ProductDetails on Product {
+  upc
+  name
+  reviews {
+    id
+  }
+}

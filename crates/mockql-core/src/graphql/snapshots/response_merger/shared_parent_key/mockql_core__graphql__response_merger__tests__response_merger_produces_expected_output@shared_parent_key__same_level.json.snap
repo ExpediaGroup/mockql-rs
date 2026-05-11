@@ -1,0 +1,19 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/shared_parent_key/same_level.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Celebrity",
+      "username": "celeb123",
+      "reviews": [
+        {
+          "id": "r1",
+          "body": "Great!"
+        }
+      ]
+    }
+  }
+}

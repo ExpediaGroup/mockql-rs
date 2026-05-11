@@ -1,0 +1,23 @@
+# mock_paths: ["topProducts", "recommendedProducts.reviewsForAuthor", "me.username", "me.reviews.body"]
+query ComplexQuery {
+  topProducts (first: 10) @mock(hint: "popular products") {
+    upc
+    name
+  }
+  recommendedProducts {
+    upc
+    name
+    reviewsForAuthor(authorID: 14) @mock(hint: "reviews by author") {
+      id
+      body
+    }
+  }
+  me {
+    id
+    username @mock(hint: "unique username")
+    reviews {
+      id
+      body @mock(hint: "a rant review")
+    }
+  }
+}

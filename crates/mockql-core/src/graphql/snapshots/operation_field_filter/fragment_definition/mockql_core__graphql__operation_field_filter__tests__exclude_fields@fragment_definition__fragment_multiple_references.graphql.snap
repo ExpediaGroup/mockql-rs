@@ -1,0 +1,17 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/fragment_definition/fragment_multiple_references.graphql
+---
+query GetProducts {
+  topProducts {
+    ...ProductFragment
+  }
+  recommendedProducts {
+    ...ProductFragment
+  }
+}
+
+fragment ProductFragment on Product {
+  id
+  price
+}

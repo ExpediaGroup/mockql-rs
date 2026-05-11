@@ -1,0 +1,25 @@
+# mock_paths: ["me.reviews.product.name", "me.reviews.body"]
+query GetUserReviews {
+  me {
+    id
+    name
+    ...UserReviews
+  }
+}
+
+fragment UserReviews on User {
+  reviews {
+    id
+    body @mock(hint: "review body")
+    ...ReviewProduct
+  }
+}
+
+fragment ReviewProduct on Review {
+  rating
+  product {
+    upc
+    name @mock(hint: "product name")
+    price
+  }
+}
