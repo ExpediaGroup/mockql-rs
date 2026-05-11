@@ -1,0 +1,5 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/error_cases/deep_collision.json
+---
+NonMergeableKeys { path: "a.b.c", details: "values cannot be merged (into: number, from: number)" }

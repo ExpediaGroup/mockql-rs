@@ -1,0 +1,15 @@
+query {
+  me @mock {
+    id
+    name @mock(hint: "celebrity name")
+    username @mock(hint: "unique username")
+    reviews @mock {
+      id
+      body
+    }
+  }
+  topProducts(first: 5) @mock(hint: "popular products") {
+    name
+    upc @mock(hint: "identifier starting with prd-")
+  }
+}

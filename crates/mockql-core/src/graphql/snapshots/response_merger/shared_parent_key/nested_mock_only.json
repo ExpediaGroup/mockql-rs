@@ -1,0 +1,18 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1",
+        "name": "Ada",
+        "accountAge": 365
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "bio": "Pioneering programmer and first computer scientist"
+      }
+    }
+  }
+}

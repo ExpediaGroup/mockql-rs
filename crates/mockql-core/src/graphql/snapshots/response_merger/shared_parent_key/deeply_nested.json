@@ -1,0 +1,30 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1",
+        "name": "Ada",
+        "review": {
+          "id": "r1",
+          "rating": 5,
+          "product": {
+            "upc": "p1",
+            "price": 999
+          }
+        }
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "review": {
+          "body": "Amazing!",
+          "product": {
+            "name": "Widget Pro"
+          }
+        }
+      }
+    }
+  }
+}

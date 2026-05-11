@@ -1,0 +1,12 @@
+# mock_paths: ["me.reviews.body"]
+query GetUserReviews {
+  me {
+    id
+    name
+    reviews {
+      id
+      body @mock(hint: "entertaining review")
+      rating
+    }
+  }
+}

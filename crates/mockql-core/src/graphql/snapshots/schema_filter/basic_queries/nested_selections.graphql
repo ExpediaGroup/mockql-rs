@@ -1,0 +1,9 @@
+query {
+  me {
+    name
+    reviews {
+      body
+      product { name }
+    }
+  }
+}

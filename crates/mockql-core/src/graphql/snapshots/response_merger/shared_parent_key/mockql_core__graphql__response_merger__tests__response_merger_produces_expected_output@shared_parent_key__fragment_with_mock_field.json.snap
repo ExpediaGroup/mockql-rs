@@ -1,0 +1,18 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/shared_parent_key/fragment_with_mock_field.json
+---
+{
+  "data": {
+    "product": {
+      "name": "Widget",
+      "price": 999,
+      "reviews": [
+        {
+          "id": "r1",
+          "body": "Love it"
+        }
+      ]
+    }
+  }
+}

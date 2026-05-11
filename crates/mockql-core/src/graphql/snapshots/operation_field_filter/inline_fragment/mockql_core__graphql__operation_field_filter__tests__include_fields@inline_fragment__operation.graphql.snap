@@ -1,0 +1,14 @@
+---
+source: crates/mockql-core/src/graphql/operation_field_filter/mod.rs
+input_file: crates/mockql-core/src/graphql/snapshots/operation_field_filter/inline_fragment/operation.graphql
+---
+query GetNode {
+  node(id: "1") {
+    ... on User {
+      name @mock(hint: "user name")
+    }
+    ... on Review {
+      body @mock(hint: "review body")
+    }
+  }
+}

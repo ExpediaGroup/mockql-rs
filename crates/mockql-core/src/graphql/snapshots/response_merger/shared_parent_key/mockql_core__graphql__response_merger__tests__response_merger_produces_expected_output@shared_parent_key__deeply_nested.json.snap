@@ -1,0 +1,22 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/shared_parent_key/deeply_nested.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Ada",
+      "review": {
+        "id": "r1",
+        "rating": 5,
+        "product": {
+          "upc": "p1",
+          "price": 999,
+          "name": "Widget Pro"
+        },
+        "body": "Amazing!"
+      }
+    }
+  }
+}

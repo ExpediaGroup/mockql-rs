@@ -1,0 +1,11 @@
+query GetProducts {
+  topProducts(first: 5) {
+    upc
+    ...ProductFields
+  }
+}
+
+fragment ProductFields on Product @mock {
+  name
+  price
+}

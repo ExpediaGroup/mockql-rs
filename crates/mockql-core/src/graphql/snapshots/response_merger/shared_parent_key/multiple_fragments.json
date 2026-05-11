@@ -1,0 +1,28 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1",
+        "username": "ada42"
+      },
+      "topProduct": {
+        "upc": "1",
+        "reviews": [
+          {
+            "id": "r1"
+          }
+        ]
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "name": "Ada"
+      },
+      "topProduct": {
+        "inStock": true
+      }
+    }
+  }
+}

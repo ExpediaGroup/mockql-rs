@@ -1,0 +1,6 @@
+query GetUserWithStatus {
+  user(id: "1") {
+    id
+    status
+  }
+}

@@ -1,0 +1,24 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/operation_mocked/with_field_mocks.graphql
+---
+{
+  "type": "OperationMocked",
+  "data": {
+    "document": "query GetInfo @mock(hint: \"operation-level hint\") { me @mock(hint: \"mocked user\") { id name } topProducts(first: 5) { reviews @mock(hint: \"positive reviews\") { body } } }",
+    "hint": "operation-level hint",
+    "mocked_fields": [
+      {
+        "path": "me",
+        "hint": "mocked user",
+        "return_type": "User"
+      },
+      {
+        "path": "topProducts.reviews",
+        "hint": "positive reviews",
+        "return_type": "Review"
+      }
+    ]
+  }
+}

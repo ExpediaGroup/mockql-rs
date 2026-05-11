@@ -1,0 +1,16 @@
+{
+  "into": {
+    "data": {
+      "person": {
+        "homeworld": null
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "person": {
+        "homeworld": "dry desert frontier"
+      }
+    }
+  }
+}

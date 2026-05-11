@@ -1,0 +1,8 @@
+query GetProducts {
+  topProducts(first: 5) {
+    name @mock
+    ... on Reviewable {
+      averageRating
+    }
+  }
+}

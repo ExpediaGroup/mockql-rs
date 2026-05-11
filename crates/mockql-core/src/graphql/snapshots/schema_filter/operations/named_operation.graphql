@@ -1,0 +1,7 @@
+# operation_name: GetUser
+query GetUser {
+  me { name }
+}
+query GetProducts {
+  topProducts { name }
+}

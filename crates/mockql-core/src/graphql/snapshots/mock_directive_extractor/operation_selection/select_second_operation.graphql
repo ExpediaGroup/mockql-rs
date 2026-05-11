@@ -1,0 +1,11 @@
+# operation_name: GetUser
+query GetProducts {
+  topProducts(first: 5) {
+    upc
+    reviews @mock { body }
+  }
+}
+
+query GetUser {
+  me { name }
+}

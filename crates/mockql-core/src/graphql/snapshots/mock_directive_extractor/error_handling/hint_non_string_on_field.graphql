@@ -1,0 +1,9 @@
+query {
+  me @mock(hint: 123) {
+    id
+    name
+  }
+  topProducts(first: 5) {
+    name
+  }
+}

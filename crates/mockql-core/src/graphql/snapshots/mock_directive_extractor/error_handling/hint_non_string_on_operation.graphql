@@ -1,0 +1,6 @@
+query @mock(hint: true) {
+  me {
+    id
+    name
+  }
+}

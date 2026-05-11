@@ -1,0 +1,23 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/disjoint_top_level/multiple_disjoint_roots.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1"
+    },
+    "topProducts": [
+      {
+        "upc": "1",
+        "name": "Widget"
+      }
+    ],
+    "recommendedProducts": [
+      {
+        "upc": "2",
+        "name": "Gadget"
+      }
+    ]
+  }
+}

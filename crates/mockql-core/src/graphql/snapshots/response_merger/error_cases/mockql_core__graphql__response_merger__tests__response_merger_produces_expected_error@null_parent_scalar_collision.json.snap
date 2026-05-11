@@ -1,0 +1,5 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/error_cases/null_parent_scalar_collision.json
+---
+NonMergeableKeys { path: "person.homeworld", details: "values cannot be merged (into: null, from: string)" }

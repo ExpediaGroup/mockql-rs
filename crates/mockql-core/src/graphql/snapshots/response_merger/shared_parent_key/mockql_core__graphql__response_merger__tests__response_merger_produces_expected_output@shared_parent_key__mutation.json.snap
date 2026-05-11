@@ -1,0 +1,16 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/shared_parent_key/mutation.json
+---
+{
+  "data": {
+    "createReview": {
+      "id": "100",
+      "author": {
+        "name": "Ada"
+      },
+      "body": "Great product!",
+      "rating": 5
+    }
+  }
+}

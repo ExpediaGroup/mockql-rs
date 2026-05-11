@@ -1,0 +1,33 @@
+{
+  "into": {
+    "data": {
+      "items": [
+        {
+          "product": {
+            "name": "Table"
+          }
+        },
+        {
+          "product": {
+            "name": "Couch"
+          }
+        }
+      ]
+    }
+  },
+  "from": {
+    "data": {
+      "items": [
+        {
+          "product": {
+            "reviews": [
+              {
+                "body": "Only one incoming item."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

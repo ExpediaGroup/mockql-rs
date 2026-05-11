@@ -1,0 +1,11 @@
+# operation_name: GetProducts
+query GetProducts {
+  topProducts(first: 5) {
+    upc
+    name
+    reviews @mock(hint: "positive reviews from verified buyers") {
+      id
+      body
+    }
+  }
+}

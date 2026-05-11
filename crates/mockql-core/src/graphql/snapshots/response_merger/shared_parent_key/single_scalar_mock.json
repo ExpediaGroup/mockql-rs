@@ -1,0 +1,17 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1",
+        "name": "Ada"
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "me": {
+        "username": "unique_user_42"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+---
+source: crates/mockql-core/src/graphql/response_merger.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_merger/preserves_response_fields/into_errors_and_extensions.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Ada",
+      "username": "mock_user_42"
+    }
+  },
+  "errors": [
+    {
+      "message": "Could not resolve field `email`",
+      "path": [
+        "me",
+        "email"
+      ]
+    }
+  ],
+  "extensions": {
+    "tracing": {
+      "version": 1
+    }
+  }
+}

@@ -1,0 +1,23 @@
+---
+source: crates/mockql-core/src/graphql/mock_directive_extractor.rs
+expression: "match MOCK_DIRECTIVE_EXTRACTOR.extract(&content, operation_name.as_deref())\n{\n    Ok(scenario) => serde_json::to_string_pretty(&scenario).unwrap(),\n    Err(error) => format!(\"{error:?}\"),\n}"
+input_file: crates/mockql-core/src/graphql/snapshots/mock_directive_extractor/edge_cases/fragment_referenced_twice.graphql
+---
+{
+  "type": "PartialMocked",
+  "data": {
+    "document": "{ topProducts { ...ProductFragment } recommendedProducts { ...ProductFragment } } fragment ProductFragment on Product { id name @mock price }",
+    "mocked_fields": [
+      {
+        "path": "topProducts.name",
+        "hint": null,
+        "return_type": "String"
+      },
+      {
+        "path": "recommendedProducts.name",
+        "hint": null,
+        "return_type": "String"
+      }
+    ]
+  }
+}

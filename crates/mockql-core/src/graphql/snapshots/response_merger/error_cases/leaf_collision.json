@@ -1,0 +1,12 @@
+{
+  "into": {
+    "data": {
+      "name": "Alice"
+    }
+  },
+  "from": {
+    "data": {
+      "name": "Bob"
+    }
+  }
+}

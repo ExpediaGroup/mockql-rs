@@ -1,0 +1,25 @@
+{
+  "into": {
+    "data": {
+      "me": {
+        "id": "1"
+      }
+    }
+  },
+  "from": {
+    "data": {
+      "topProducts": [
+        {
+          "upc": "1",
+          "name": "Widget"
+        }
+      ],
+      "recommendedProducts": [
+        {
+          "upc": "2",
+          "name": "Gadget"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.DS_Store
+
+/target/
+*.profraw
+test_output.log
+
+.vscode/*
+!.vscode/settings.json
+*.code-workspace
+.internal
+prompt.dbg.txt
+
+# .lldb debug alias
+.lldbinit
+megalinter-reports/
