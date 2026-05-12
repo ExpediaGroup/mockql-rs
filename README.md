@@ -23,6 +23,7 @@ Depending on where `@mock` appears, `mockql` will:
 - [`crates/mockql-cli`](./crates/mockql-cli): CLI crate and `mockql` binary
 - [`docs/mock-specification.md`](./docs/mock-specification.md): `@mock` directive semantics
 - [`docs/provider-cli.md`](./docs/provider-cli.md): provider prerequisites and exact CLI integration details
+- [`docs/provider-http.md`](./docs/provider-http.md): provider prerequisites and exact CLI integration details
 - [`examples/swapi`](./examples/swapi): SWAPI GraphQL examples
 - [`examples/countries`](./examples/countries): Countries GraphQL examples
 
@@ -34,7 +35,6 @@ Depending on where `@mock` appears, `mockql` will:
   - `opencode`
 - Or an HTTP-backed provider with credentials.
   - `github-copilot` (requires `GITHUB_TOKEN` env variable)
-- Network access to the target GraphQL endpoint unless you supply a local schema with `--schema`
 
 ## 🔨 Build
 
@@ -56,86 +56,24 @@ Or directly after building:
 
 ## ⌨️ Usage
 
+
+### oneshot
+Execute a single GraphQL operation and print the response to stdout.
 ```bash
 mockql oneshot --operation <file.graphql> --graphql-url <https://example.com/graphql> [options] cli|http
+```
+
+### proxy
+start an HTTP proxy server that listens for GraphQL requests, exposing a graphiql interface at `http://localhost:<port>/graphiql`.
+```bash
 mockql proxy --port <port> --graphql-url <https://example.com/graphql> [options] cli|http
+```
+
+### schema
+Load and print the decorated GraphQL schema with `@mock` directive
+```bash
 mockql schema (--schema <schema.graphql> | --graphql-url <https://example.com/graphql>) [options]
 ```
-
-### 🔎 Arguments overview
-
-```mermaid
----
-config:
-  theme: dark
----
-mindmap
-    root((mockql))
-        {{Mocking commands}}
-            **oneshot**
-                --operation
-                --operation-name
-                --variables
-                --schema-extension
-                --graphql-header
-            **proxy**
-                --port
-                --introspection-header
-            {{Shared mocking flags: --graphql-url, --schema, --timeout, --format json|toon}}
-            {{Transport}}
-                **cli**
-                    --provider
-                        claude
-                        codex
-                        opencode
-                    --model
-                **http**
-                    --provider
-                        github-copilot
-                    --model
-        {{Schema command}}
-            **schema**
-                Show decorated schema
-                --schema
-                --graphql-url
-                --header
-                --timeout
-```
-
-#### Global Arguments
-
-- `--schema <path>`: use a local schema SDL file instead of introspection
-- `--graphql-url <url>`: introspect or execute against a GraphQL endpoint
-- `--variables <path>`: JSON object file for operation variables
-- `--operation-name <name>`: select a named operation from a multi-operation document
-- `--schema-extension <path>`: SDL extension file applied before planning
-- `--graphql-header name:value`: add request headers to introspection and upstream execution
-- `--introspection-header name:value`: add request headers to proxy startup introspection
-- `--header name:value`: add request headers to `schema --graphql-url` introspection
-- `--timeout <duration>`: provider timeout such as `30s` or `2m`
-- `--format <json|toon>`: prompt serialization format
-
-#### Subcommands
-
-- `oneshot`: execute one mock-aware GraphQL operation and print the response
-- `proxy`: start an HTTP proxy server that mocks GraphQL responses
-- `schema`: print the decorated GraphQL schema from a local SDL file or upstream introspection
-
-#### Schema Loading
-
-If `--schema` is omitted, `mockql` introspects the schema from `--graphql-url` and injects the built-in `@mock(hint: String)` directive definition when the upstream schema does not already define it.
-If `--schema-extension` is provided, its SDL is applied during planning so you can mock fields or types that are not present in the base schema.
-
-#### LLM Provider
-
-- `cli --provider <claude|codex|opencode> [--model <name>]`: shell out to a local provider CLI
-- `http --provider <github-copilot> --model <name>`: use an HTTP-backed provider
-
-`--model` is optional under `cli` and defaults per backend:
-
-- `cli --provider claude` => `sonnet`
-- `cli --provider codex` => `gpt-5.4-mini`
-- `cli --provider opencode` => `github-copilot/gemini-3-flash-preview`
 
 ## Quick Start Examples
 
