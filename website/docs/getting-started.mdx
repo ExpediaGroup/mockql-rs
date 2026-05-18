@@ -1,0 +1,115 @@
+---
+id: getting-started
+title: Getting Started
+slug: /
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Getting Started
+
+MockQL (`mockql`) executes GraphQL operations that use `@mock` to ask an LLM provider for mocked response data. Depending on where `@mock` appears, MockQL can pass the operation through unchanged, generate the full response, or merge upstream data with mocked fields.
+
+## Command Shape
+
+```bash
+mockql <oneshot|proxy> [command options] <cli|http> [provider options]
+```
+
+`cli` and `http` are provider transports used by `oneshot` and `proxy`. The `schema` command does not use a provider.
+
+## Prerequisites
+
+- For `cli`, install and authenticate one of `claude`, `codex`, or `opencode`.
+- For `http`, use `--provider github-copilot --model <model>` and set `GITHUB_TOKEN`.
+
+## First Run
+
+### Query
+
+This example queries Star Wars films from SWAPI, keeps each film `title` from the upstream GraphQL API, and asks `mockql`
+to generate `openingCrawl` and `director` for each film using the provided hints.
+
+```graphql
+query AllFilms {
+  allFilms {
+    films {
+      title
+      openingCrawl @mock(hint: "Use the real opening crawl of the film")
+      director @mock(hint: "Real director of the film")
+    }
+  }
+}
+```
+
+### Command
+```bash
+mockql oneshot \
+  --operation ./examples/swapi/partial-list-items.graphql \
+  --graphql-url https://swapi-graphql.netlify.app/graphql \
+  cli --provider codex --model gpt-5.4-mini
+```
+
+### Response
+```json
+{
+  "data": {
+    "allFilms": {
+      "films": [
+        {
+          "title": "A New Hope",
+          "openingCrawl": "It is a period of civil war. Rebel spaceships, striking from a hidden base, have won their first victory against the evil Galactic Empire.",
+          "director": "George Lucas"
+        },
+        {
+          "title": "The Empire Strikes Back",
+          "openingCrawl": "It is a dark time for the Rebellion. Although the Death Star has been destroyed, Imperial troops have driven the Rebel forces from their hidden base.",
+          "director": "Irvin Kershner"
+        },
+        {
+          "title": "Return of the Jedi",
+          "openingCrawl": "Luke Skywalker has returned to his home planet of Tatooine in an attempt to rescue his friend Han Solo from the clutches.",
+          "director": "Richard Marquand"
+        },
+        {
+          "title": "The Phantom Menace",
+          "openingCrawl": "Turmoil has engulfed the Galactic Republic. The taxation of trade routes to outlying star systems is in dispute.",
+          "director": "George Lucas"
+        },
+        {
+          "title": "Attack of the Clones",
+          "openingCrawl": "There is unrest in the Galactic Senate. Several thousand solar systems have declared their intentions to leave the Republic.",
+          "director": "George Lucas"
+        },
+        {
+          "title": "Revenge of the Sith",
+          "openingCrawl": "War! The Republic is crumbling under attacks by the ruthless Sith Lord, Count Dooku. There are heroes on both sides.",
+          "director": "George Lucas"
+        }
+      ]
+    }
+  },
+  "extensions": {
+    "mockResponse": {
+      "reasoning": "Generated opening crawls and directors for the 6 Star Wars films identified in the partial response, matching the provided hints for each list item."
+    }
+  }
+}
+```
+
+## How Does It Work?
+### 1. Parse and validate the operation
+`mockql` first checks that the GraphQL operation is valid and matches the schema.
+### 2. Mock Planning
+`mockql` scans the operation for fields annotated with `@mock` and collects their hints.
+### 3. Mock Plan Execution
+In this example, `mockql` chooses a `PartialMock` plan because `title` comes from the upstream API, while `openingCrawl` and `director` are generated.
+### 4. Send the upstream query
+`mockql` sends a reduced query to the upstream GraphQL API with only the non-mocked fields, such as `title`.
+### 5. Prepare the prompt for the LLM provider
+`mockql` prepares a prompt containing the mocked fields, their hints, the original query, the partial upstream response, and the relevant schema subset.
+### 6. Merge the responses
+Finally, `mockql` combines the upstream data with the generated mock data and returns one complete GraphQL response.
+
+![MockQL CLI infographic](/img/mockql-infograph.jpg)

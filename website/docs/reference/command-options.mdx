@@ -1,0 +1,56 @@
+---
+title: Command Options
+---
+
+# Command Options
+
+This page collects the main command flags. Provider flags are documented separately in [CLI Providers](../provider-cli.md) and [HTTP Providers](../provider-http.md).
+
+## Command Syntax
+
+```bash
+mockql oneshot [OPTIONS] --operation <OPERATION> --graphql-url <GRAPHQL_URL> <COMMAND>
+mockql proxy [OPTIONS] --port <PORT> --graphql-url <GRAPHQL_URL> <COMMAND>
+mockql schema [OPTIONS]
+```
+
+For `oneshot` and `proxy`, `<COMMAND>` is `cli` or `http`:
+
+```bash
+mockql oneshot [command options] cli --provider <claude|codex|opencode> [--model <model>]
+mockql oneshot [command options] http --provider github-copilot --model <model>
+```
+
+## Shared Options
+
+| Option | Commands | Description |
+| --- | --- | --- |
+| `--graphql-url <GRAPHQL_URL>` | `oneshot`, `proxy`, `schema` | GraphQL endpoint used for upstream execution and schema introspection. For `schema`, it is only used for introspection. |
+| `--schema <SCHEMA>` | `oneshot`, `proxy`, `schema` | Local GraphQL schema file. For `oneshot` and `proxy`, this skips schema introspection. |
+| `--timeout <TIMEOUT>` | `oneshot`, `proxy`, `schema` | Timeout such as `30s` or `2m`. Default: `1m`. |
+
+## oneshot Options
+
+| Option | Description |
+| --- | --- |
+| `--operation <OPERATION>` | GraphQL operation path to execute. |
+| `--variables <VARIABLES>` | Optional path to a JSON file containing variables for the operation. |
+| `--operation-name <OPERATION_NAME>` | Optional operation name for documents with multiple operation definitions. |
+| `--schema-extension <SCHEMA_EXTENSION>` | Optional path to a GraphQL schema extension file for mocking fields or types absent from the base schema. |
+| `--graphql-header <GRAPHQL_HEADERS>` | Additional headers to include in GraphQL requests. Specify as `name:value`; repeat the flag for multiple headers. |
+| `--format <FORMAT>` | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`. |
+
+## proxy Options
+
+| Option | Description |
+| --- | --- |
+| `--port <PORT>` | Port for the mock GraphQL server. |
+| `--introspection-header <INTROSPECTION_HEADERS>` | Additional headers to include in the introspection query if no local schema was provided. Specify as `name:value`; repeat the flag for multiple headers. |
+| `--format <FORMAT>` | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`. |
+
+## schema Options
+
+| Option | Description |
+| --- | --- |
+| `--minify` | Minify Schema SDL into a token-friendly representation. |
+| `--header <HEADERS>` | Headers to include in the introspection query. Specify as `name:value`; repeat the flag for multiple headers. |

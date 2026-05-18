@@ -1,0 +1,38 @@
+name: Publish Latest Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+
+jobs:
+  publish-docs:
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    if: github.repository == 'ExpediaGroup/mockql-rs'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Build website
+        run: |
+          cd website
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Deploy GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build
+          user_name: eg-oss-ci
+          user_email: oss@expediagroup.com
