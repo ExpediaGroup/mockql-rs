@@ -1,0 +1,59 @@
+---
+title: oneshot
+---
+
+# oneshot
+
+`oneshot` executes one GraphQL operation and prints the JSON response to stdout.
+
+```bash
+mockql oneshot [OPTIONS] --operation <OPERATION> --graphql-url <GRAPHQL_URL> <COMMAND>
+```
+
+`<COMMAND>` is the provider transport: `cli` or `http`.
+
+## CLI Provider
+
+Use `cli` when you want MockQL to call an installed assistant CLI such as `claude`, `codex`, or `opencode`.
+
+```bash
+mockql oneshot \
+  --operation ./examples/swapi/partial-list-items.graphql \
+  --variables ./examples/swapi/partial-list-items.json \
+  --graphql-url https://swapi-graphql.netlify.app/graphql \
+  cli --provider codex --model gpt-5.4-mini
+```
+
+The provider transport and provider options come after the `oneshot` options:
+
+```bash
+mockql oneshot [command options] cli --provider <claude|codex|opencode> [--model <model>]
+```
+
+## HTTP Provider
+
+Use `http` when you want MockQL to call an HTTP provider. The supported HTTP provider is `github-copilot`, which requires `GITHUB_TOKEN`.
+
+```bash
+mockql oneshot \
+  --operation ./examples/swapi/partial-list-items.graphql \
+  --variables ./examples/swapi/partial-list-items.json \
+  --graphql-url https://swapi-graphql.netlify.app/graphql \
+  http --provider github-copilot --model gpt-5.4-mini
+```
+
+## Options
+
+| Option | Description |
+| --- | --- |
+| `--operation <OPERATION>` | GraphQL operation path to execute. |
+| `--graphql-url <GRAPHQL_URL>` | GraphQL server URL used for schema introspection and upstream execution. |
+| `--schema <SCHEMA>` | Optional path to a GraphQL schema file. If omitted, the schema is loaded from `--graphql-url` via introspection. |
+| `--operation-name <OPERATION_NAME>` | Optional operation name for documents with multiple operation definitions. |
+| `--variables <VARIABLES>` | Optional path to a JSON file containing variables for the operation. |
+| `--schema-extension <SCHEMA_EXTENSION>` | Optional path to a GraphQL schema extension file for mocking fields or types absent from the base schema. |
+| `--graphql-header <GRAPHQL_HEADERS>` | Additional headers to include in GraphQL requests. Specify as `name:value`; repeat the flag for multiple headers. |
+| `--timeout <TIMEOUT>` | Timeout for provider execution, e.g. `30s` or `2m`. Default: `1m`. |
+| `--format <FORMAT>` | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`. |
+
+See the [shared command options reference](../reference/command-options.mdx) for all command flags in one place.

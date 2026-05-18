@@ -1,0 +1,20 @@
+{
+  "name": "mockql-rs-docs",
+  "license": "MIT OR Apache-2.0",
+  "repository": "https://github.com/ExpediaGroup/mockql-rs",
+  "private": true,
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "version": "docusaurus docs:version",
+    "clean": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "swizzle": "docusaurus swizzle"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.1",
+    "@docusaurus/preset-classic": "3.10.1",
+    "@docusaurus/theme-mermaid": "3.10.1",
+    "@mermaid-js/layout-elk": "0.2.1"
+  }
+}

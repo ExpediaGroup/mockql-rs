@@ -1,0 +1,58 @@
+---
+title: schema
+---
+
+# schema
+
+`schema` prints a GraphQL schema decorated with the `@mock` directive. It does not use an LLM provider.
+
+```bash
+mockql schema [OPTIONS]
+```
+
+## From Introspection
+
+Use `--graphql-url` to load the schema from a GraphQL endpoint:
+
+```bash
+mockql schema \
+  --graphql-url https://swapi-graphql.netlify.app/graphql
+```
+
+Add headers to the introspection request with `--header`:
+
+```bash
+mockql schema \
+  --graphql-url https://api.example.com/graphql \
+  --header "authorization:Bearer $TOKEN"
+```
+
+## From Local SDL
+
+Use `--schema` to load an SDL file:
+
+```bash
+mockql schema --schema ./schema.graphql
+```
+
+## Minified Output
+
+Use `--minify` to print Schema SDL in a token-friendly representation:
+
+```bash
+mockql schema \
+  --schema ./schema.graphql \
+  --minify
+```
+
+## Options
+
+| Option | Description |
+| --- | --- |
+| `--minify` | Minify Schema SDL into a token-friendly representation. |
+| `--schema <SCHEMA>` | Path to GraphQL schema file. |
+| `--graphql-url <GRAPHQL_URL>` | GraphQL server URL used for schema introspection. |
+| `--header <HEADERS>` | Headers to include in the introspection query. Specify as `name:value`; repeat the flag for multiple headers. |
+| `--timeout <TIMEOUT>` | Timeout for introspection query, e.g. `30s` or `2m`. Default: `1m`. |
+
+See the [shared command options reference](../reference/command-options.mdx) for all command flags in one place.
