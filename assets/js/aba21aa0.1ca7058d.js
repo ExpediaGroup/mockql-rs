@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[5742],{7093(s){s.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"default"}')}}]);

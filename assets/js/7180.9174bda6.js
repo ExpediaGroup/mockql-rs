@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[7180],{7180(c,e,s){s.d(e,{createPacketServices:()=>k.$});var k=s(4824);s(9302)}}]);

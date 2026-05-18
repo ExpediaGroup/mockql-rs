@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[9647],{7121(s,e,r){r.r(e),r.d(e,{default:()=>n});r(6540);var c=r(4164),u=r(7559),a=r(5500),l=r(2831),o=r(9139),d=r(4848);function n(s){return(0,d.jsx)(a.e3,{className:(0,c.A)(u.G.wrapper.docsPages),children:(0,d.jsx)(o.A,{children:(0,l.v)(s.route.routes)})})}}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[6402],{6402(c,e,s){s.d(e,{createArchitectureServices:()=>r.S});var r=s(5016);s(9302)}}]);

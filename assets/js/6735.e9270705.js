@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[6735],{6735(e,s,c){c.d(s,{createEventModelingServices:()=>k.g});var k=c(2968);c(9302)}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[2555],{2555(e,s,c){c.d(s,{createWardleyServices:()=>r.J});var r=c(4837);c(9302)}}]);
