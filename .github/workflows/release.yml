@@ -8,20 +8,26 @@ on:
 env:
   RUST_VERSION: "1.95.0"
 
-permissions:
-  contents: read
-
 jobs:
   build:
-    name: Build (${{ matrix.os-name }}-${{ matrix.arch-name }})
+    name: Build (${{ matrix.target }})
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - runner: macos-latest
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+          - runner: macos-14
             target: aarch64-apple-darwin
-            os-name: darwin
-            arch-name: arm64
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
     steps:
       - name: Enable long paths on Windows
         if: runner.os == 'Windows'
@@ -55,20 +61,29 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Package binary
+        shell: bash
         run: |
-          ARCHIVE_NAME="mockql-rs-${{ github.event.release.tag_name }}-${{ matrix.os-name }}-${{ matrix.arch-name }}"
-          mkdir -p "${ARCHIVE_NAME}"
-          cp target/${{ matrix.target }}/release/mockql "${ARCHIVE_NAME}/"
-          zip -r "${ARCHIVE_NAME}.zip" "${ARCHIVE_NAME}"
+          TARGET="${{ matrix.target }}"
+          ARCHIVE_NAME="mockql-rs-${{ github.event.release.tag_name }}-${TARGET}"
+          BINARY="target/${TARGET}/release/mockql"
+
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            BINARY="${BINARY}.exe"
+          fi
+
+          mkdir -p "dist/${ARCHIVE_NAME}"
+          cp "${BINARY}" "dist/${ARCHIVE_NAME}/"
+          tar -czf "${ARCHIVE_NAME}.tar.gz" -C dist "${ARCHIVE_NAME}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: mockql-rs-${{ matrix.os-name }}-${{ matrix.arch-name }}
-          path: "*.zip"
+          name: mockql-rs-${{ matrix.target }}
+          path: "*.tar.gz"
+          if-no-files-found: error
 
-  release:
-    name: Upload to GitHub Release
+  publish-github:
+    name: Publish GitHub release
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -80,14 +95,49 @@ jobs:
           path: artifacts
           merge-multiple: true
 
+      - name: Create checksums
+        working-directory: artifacts
+        run: |
+          sha256sum ./*.tar.gz > sha256sums.txt
+          sha1sum ./*.tar.gz > sha1sums.txt
+          md5sum ./*.tar.gz > md5sums.txt
+
       - name: Upload binaries to release
         uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
         with:
-          files: artifacts/*.zip
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            artifacts/*.tar.gz
+            artifacts/md5sums.txt
+            artifacts/sha1sums.txt
+            artifacts/sha256sums.txt
 
-      # - name: Publish to crates.io
-      #   env:
-      #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-      #   run: |
-      #     cargo publish -p mockql-core
-      #     cargo publish -p mockql
+
+  publish-cargo:
+    name: Publish Cargo crates
+    needs: publish-github
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          cargo publish -p mockql-core
+
+          for attempt in 1 2 3 4 5; do
+            if cargo publish -p mockql-cli; then
+              exit 0
+            fi
+
+            echo "mockql-cli publish failed, retrying after crates.io index catches up (${attempt}/5)"
+            sleep 30
+          done
+
+          exit 1

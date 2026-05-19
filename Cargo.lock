@@ -88,9 +88,9 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
 name = "apollo-compiler"
-version = "1.31.1"
+version = "1.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09e0b71d829a6eec7900cab1ef14791290a3b2edf201dbc7c56cae5ef001475d"
+checksum = "b877306ffde4d3cc428bbc8f506fdd67b99255298ae92b919954c0c52f530504"
 dependencies = [
  "ahash",
  "apollo-parser",
@@ -2375,9 +2375,9 @@ dependencies = [
 
 [[package]]
 name = "toon-format"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5933bebbba70ee979314a8ecb021f53075a63984f94f89a10b4bdcf0af6c62b6"
+checksum = "af1dae994fe9adfb44bdc74fc17546651604a59af32136256515bc1218850832"
 dependencies = [
  "indexmap 2.14.0",
  "serde",
@@ -3072,6 +3072,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "regex",
  "rusty-hook",
  "xshell",
 ]

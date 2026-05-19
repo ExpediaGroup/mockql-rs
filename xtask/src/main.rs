@@ -15,11 +15,14 @@
 //! Workspace automation tasks for formatting and linting.
 #![deny(missing_docs)]
 
+mod fmt;
+mod lint;
+mod release;
+mod test;
+
 use anyhow::Result;
 use clap::Parser;
 use clap::Subcommand;
-use xshell::Shell;
-use xshell::cmd;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about = "Workspace automation tasks")]
@@ -36,6 +39,11 @@ enum Command {
   Fmt,
   /// Run tests.
   Test,
+  /// Prepare a coordinated workspace release.
+  Release {
+    #[command(subcommand)]
+    command: release::Command,
+  },
 }
 
 fn main() -> Result<()> {
@@ -45,32 +53,10 @@ fn main() -> Result<()> {
 impl XTask {
   fn run(self) -> Result<()> {
     match self.command {
-      Command::Lint => exec_lint(),
-      Command::Fmt => exec_fmt(),
-      Command::Test => exec_test(),
+      Command::Lint => lint::run(),
+      Command::Fmt => fmt::run(),
+      Command::Test => test::run(),
+      Command::Release { command } => release::run(command),
     }
   }
-}
-
-fn exec_lint() -> Result<()> {
-  let sh = Shell::new()?;
-  cmd!(sh, "cargo fmt --all -- --check").run()?;
-  cmd!(
-    sh,
-    "cargo clippy --workspace --all-targets --all-features -- -D warnings"
-  )
-  .run()?;
-  Ok(())
-}
-
-fn exec_fmt() -> Result<()> {
-  let sh = Shell::new()?;
-  cmd!(sh, "cargo fmt --all").run()?;
-  Ok(())
-}
-
-fn exec_test() -> Result<()> {
-  let sh = Shell::new()?;
-  cmd!(sh, "cargo test --workspace --all-features").run()?;
-  Ok(())
 }

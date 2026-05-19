@@ -4,6 +4,10 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
+description = "Command-line interface for GenAI-powered GraphQL response mocking via @mock"
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "mockql"
@@ -13,7 +17,7 @@ path = "src/main.rs"
 axum.workspace = true
 clap.workspace = true
 humantime.workspace = true
-mockql-core = { path = "../mockql-core" }
+mockql-core = { path = "../mockql-core", version = "=0.1.0" }
 reqwest.workspace = true
 serde_json.workspace = true
 serde_json_bytes.workspace = true

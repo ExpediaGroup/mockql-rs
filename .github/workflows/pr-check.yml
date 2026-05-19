@@ -1,0 +1,11 @@
+---
+name: Pull Request Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore: ['website/**', '*.md']
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
