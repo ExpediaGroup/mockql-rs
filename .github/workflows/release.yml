@@ -103,14 +103,29 @@ jobs:
           md5sum ./*.tar.gz > md5sums.txt
 
       - name: Upload binaries to release
-        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
-        with:
-          tag_name: ${{ github.event.release.tag_name }}
-          files: |
-            artifacts/*.tar.gz
-            artifacts/md5sums.txt
-            artifacts/sha1sums.txt
-            artifacts/sha256sums.txt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ github.event.release.id }}
+          RELEASE_UPLOAD_URL: ${{ github.event.release.upload_url }}
+        run: |
+          UPLOAD_URL="${RELEASE_UPLOAD_URL%%\{*}"
+
+          for file in artifacts/*.tar.gz artifacts/md5sums.txt artifacts/sha1sums.txt artifacts/sha256sums.txt; do
+            name="$(basename "${file}")"
+            asset_id="$(gh api "repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" --jq ".[] | select(.name == \"${name}\") | .id")"
+
+            if [[ -n "${asset_id}" ]]; then
+              gh api --method DELETE "repos/${{ github.repository }}/releases/assets/${asset_id}"
+            fi
+
+            curl --fail-with-body \
+              --request POST \
+              --header "Authorization: Bearer ${GH_TOKEN}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              --header "Content-Type: application/octet-stream" \
+              --data-binary "@${file}" \
+              "${UPLOAD_URL}?name=${name}"
+          done
 
 
   publish-cargo:
