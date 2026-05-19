@@ -1,7 +1,7 @@
 ---
-name: Publish Latest Docs
+name: Pull Request Check Documentation
 
-on:
+"on":
   push:
     branches: [main]
     paths: ['website/**']
@@ -28,11 +28,3 @@ jobs:
           cd website
           bun install --frozen-lockfile
           bun run build
-
-      - name: Deploy GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./website/build
-          user_name: eg-oss-ci
-          user_email: oss@expediagroup.com

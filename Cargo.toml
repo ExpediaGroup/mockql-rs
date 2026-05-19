@@ -10,9 +10,12 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.95.0"
 license = "MIT OR Apache-2.0"
+documentation = "https://opensource.expediagroup.com/mockql-rs"
+homepage = "https://opensource.expediagroup.com/mockql-rs"
+repository = "https://github.com/ExpediaGroup/mockql-rs"
 
 [workspace.dependencies]
-apollo-compiler = "1.31.1"
+apollo-compiler = "1.32.0"
 axum = "0.8.9"
 buildstructor = "0.6.0"
 clap = { version = "4.6.1", features = ["derive", "env"] }
@@ -29,4 +32,4 @@ serde_json_bytes = { version = "0.2.5", features = ["preserve_order"] }
 tempfile = "3.27.0"
 thiserror = "2.0.18"
 tokio = { version = "1.52.3", features = ["full"] }
-toon-format = { version = "0.4.5", default-features = false }
+toon-format = { version = "0.4.6", default-features = false }

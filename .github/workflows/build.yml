@@ -1,9 +1,8 @@
 ---
-name: PR
+name: Build
 
 on:
-  pull_request:
-    branches: [main]
+  workflow_call:
 
 env:
   RUST_VERSION: "1.95.0"
