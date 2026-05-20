@@ -1,0 +1,9 @@
+extend type Country {
+  travelAdvisory: TravelAdvisory
+}
+
+type TravelAdvisory {
+  summary: String
+  bestSeason: String
+  highlights: [String]
+}

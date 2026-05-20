@@ -11,25 +11,25 @@ This query uses specific `@mock(hint: "...")` directives to force custom values 
 ### CLI provider
 
 ```bash
-cargo run -p mockql-cli -- oneshot \           # Build and run the mockql binary, execute a single operation
-  --operation ./examples/countries/contextual-hint.graphql \  # GraphQL operation file to execute
-  --variables ./examples/countries/contextual-hint.json \     # JSON file with operation variables
-  --graphql-url https://countries.trevorblades.com/ \         # Target GraphQL endpoint for upstream requests and introspection
-  cli \                                         # Use a local CLI agent as an LLM provider
-    --provider claude \                         # CLI backend: claude
-    --model sonnet                              # Model: forwarded to the provider
+cargo run -p mockql-cli -- oneshot \
+  --operation ./examples/countries/contextual-hint.graphql \
+  --variables ./examples/countries/contextual-hint.json \
+  --graphql-url https://countries.trevorblades.com/ \
+  cli \
+    --provider claude \
+    --model sonnet
 ```
 
 ### HTTP provider
 
 ```bash
-cargo run -p mockql-cli -- oneshot \           # Build and run the mockql binary, execute a single operation
-  --operation ./examples/countries/contextual-hint.graphql \  # GraphQL operation file to execute
-  --variables ./examples/countries/contextual-hint.json \     # JSON file with operation variables
-  --graphql-url https://countries.trevorblades.com/ \         # Target GraphQL endpoint for upstream requests and introspection
-  http \                                        # use an HTTP endpoint as an LLM provider
-    --provider github-copilot \                 # HTTP backend: github-copilot (requires GITHUB_TOKEN)
-    --model claude-sonnet-4                     # Model: forwarded to the provider
+cargo run -p mockql-cli -- oneshot \
+  --operation ./examples/countries/contextual-hint.graphql \
+  --variables ./examples/countries/contextual-hint.json \
+  --graphql-url https://countries.trevorblades.com/ \
+  http \
+    --provider github-copilot \
+    --model claude-sonnet-4
 ```
 
 ## Complete Interface Mocking
@@ -39,23 +39,34 @@ This query demonstrates mocking an entire `continent` object including its neste
 ### CLI provider
 
 ```bash
-cargo run -p mockql-cli -- oneshot \           # Build and run the mockql binary, execute a single operation
-  --operation ./examples/countries/complete-interface.graphql \  # GraphQL operation file to execute
-  --variables ./examples/countries/complete-interface.json \     # JSON file with operation variables
-  --graphql-url https://countries.trevorblades.com/ \           # Target GraphQL endpoint for upstream requests and introspection
-  cli \                                         # Use a local CLI agent as an LLM provider
-    --provider claude \                         # CLI backend: claude
-    --model sonnet                              # Model: forwarded to the provider
+cargo run -p mockql-cli -- oneshot \
+  --operation ./examples/countries/complete-interface.graphql \
+  --variables ./examples/countries/complete-interface.json \
+  --graphql-url https://countries.trevorblades.com/ \
+  cli --provider claude --model sonnet
 ```
 
 ### HTTP provider
 
 ```bash
-cargo run -p mockql-cli -- oneshot \           # Build and run the mockql binary, execute a single operation
-  --operation ./examples/countries/complete-interface.graphql \  # GraphQL operation file to execute
-  --variables ./examples/countries/complete-interface.json \     # JSON file with operation variables
-  --graphql-url https://countries.trevorblades.com/ \           # Target GraphQL endpoint for upstream requests and introspection
-  http \                                        # use an HTTP endpoint as an LLM provider
-    --provider github-copilot \                 # HTTP backend: github-copilot (requires GITHUB_TOKEN)
-    --model claude-sonnet-4                     # Model: forwarded to the provider
+cargo run -p mockql-cli -- oneshot \
+  --operation ./examples/countries/complete-interface.graphql \
+  --variables ./examples/countries/complete-interface.json \
+  --graphql-url https://countries.trevorblades.com/ \
+  http --provider github-copilot --model claude-sonnet-4
+```
+
+## Schema Extension
+
+This query fetches real country data while mocking a `travelAdvisory` field that is absent from the base Countries API schema. The `--schema-extension <SCHEMA_EXTENSION>` option points to a GraphQL schema extension file for mocking fields or types absent from the base schema.
+
+### HTTP provider
+
+```bash
+cargo run -p mockql-cli -- oneshot \
+  --operation ./examples/countries/schema-extension-example.graphql \
+  --variables ./examples/countries/schema-extension-example.json \
+  --schema-extension ./examples/countries/schema-extension.graphql \
+  --graphql-url https://countries.trevorblades.com/ \
+  http --provider github-copilot --model gemini-3.5-flash
 ```

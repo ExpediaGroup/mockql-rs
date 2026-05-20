@@ -1,0 +1,9 @@
+extend type Film {
+  productionBrief: ProductionBrief
+}
+
+type ProductionBrief {
+  tone: String
+  behindTheScenesNote: String
+  marketingTagline: String
+}

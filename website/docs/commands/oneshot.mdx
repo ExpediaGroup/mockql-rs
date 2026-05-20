@@ -42,18 +42,49 @@ mockql oneshot \
   http --provider github-copilot --model gpt-5.4-mini
 ```
 
+## Mocking Fields Outside The Schema
+
+Some use cases require mocking fields or types that are not part of the upstream GraphQL schema yet. MockQL supports this with [GraphQL schema extensions](https://spec.graphql.org/September2025/#sec-Schema-Extension) through `--schema-extension`.
+
+For example, SWAPI does not expose a `productionBrief` field on `Film`. Define the missing field and type in an extension file:
+
+```graphql
+extend type Film {
+  productionBrief: ProductionBrief
+}
+
+type ProductionBrief {
+  tone: String
+  behindTheScenesNote: String
+  marketingTagline: String
+}
+```
+
+Then select the extended field with `@mock` and pass the extension file to `oneshot`:
+
+```bash
+mockql oneshot \
+  --operation ./schema-extension-example.graphql \
+  --variables ./schema-extension-example.json \
+  --schema-extension ./schema-extension.graphql \
+  --graphql-url https://swapi-graphql.netlify.app/graphql \
+  http --provider github-copilot --model gemini-3.5-flash
+```
+
+Because `productionBrief` is not resolved by SWAPI, it should be selected with `@mock`.
+
 ## Options
 
-| Option | Description |
-| --- | --- |
-| `--operation <OPERATION>` | GraphQL operation path to execute. |
-| `--graphql-url <GRAPHQL_URL>` | GraphQL server URL used for schema introspection and upstream execution. |
-| `--schema <SCHEMA>` | Optional path to a GraphQL schema file. If omitted, the schema is loaded from `--graphql-url` via introspection. |
-| `--operation-name <OPERATION_NAME>` | Optional operation name for documents with multiple operation definitions. |
-| `--variables <VARIABLES>` | Optional path to a JSON file containing variables for the operation. |
-| `--schema-extension <SCHEMA_EXTENSION>` | Optional path to a GraphQL schema extension file for mocking fields or types absent from the base schema. |
-| `--graphql-header <GRAPHQL_HEADERS>` | Additional headers to include in GraphQL requests. Specify as `name:value`; repeat the flag for multiple headers. |
-| `--timeout <TIMEOUT>` | Timeout for provider execution, e.g. `30s` or `2m`. Default: `1m`. |
-| `--format <FORMAT>` | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`. |
+| Option                                  | Description                                                                                                       |
+|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `--operation <OPERATION>`               | GraphQL operation path to execute.                                                                                |
+| `--graphql-url <GRAPHQL_URL>`           | GraphQL server URL used for schema introspection and upstream execution.                                          |
+| `--schema <SCHEMA>`                     | Optional path to a GraphQL schema file. If omitted, the schema is loaded from `--graphql-url` via introspection.  |
+| `--operation-name <OPERATION_NAME>`     | Optional operation name for documents with multiple operation definitions.                                        |
+| `--variables <VARIABLES>`               | Optional path to a JSON file containing variables for the operation.                                              |
+| `--schema-extension <SCHEMA_EXTENSION>` | Optional path to a GraphQL schema extension file for mocking fields or types absent from the base schema.         |
+| `--graphql-header <GRAPHQL_HEADERS>`    | Additional headers to include in GraphQL requests. Specify as `name:value`; repeat the flag for multiple headers. |
+| `--timeout <TIMEOUT>`                   | Timeout for provider execution, e.g. `30s` or `2m`. Default: `1m`.                                                |
+| `--format <FORMAT>`                     | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`.              |
 
 See the [shared command options reference](../reference/command-options.mdx) for all command flags in one place.

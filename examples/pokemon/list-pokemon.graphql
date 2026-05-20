@@ -1,0 +1,15 @@
+query ListPokemon($limit: Int = 5) {
+  pokemon(limit: $limit, order_by: { id: asc }) {
+    id
+    name @mock(hint: "friendly display name for a starter Pokemon")
+    height
+    weight
+    base_experience
+    pokemontypes(order_by: { slot: asc }) {
+      slot
+      type {
+        name
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+query GetFilmWithProductionBrief($id: ID!) {
+  film(id: $id) {
+    id
+    title
+    releaseDate
+    productionBrief @mock(hint: "concise Star Wars production brief") {
+      tone
+      behindTheScenesNote
+      marketingTagline
+    }
+  }
+}

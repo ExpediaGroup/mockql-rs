@@ -1,0 +1,12 @@
+query GetCountryWithTravelAdvisory($code: ID!) {
+  country(code: $code) {
+    code
+    name
+    capital
+    travelAdvisory @mock(hint: "friendly travel advisory for first-time visitors") {
+      summary
+      bestSeason
+      highlights
+    }
+  }
+}
