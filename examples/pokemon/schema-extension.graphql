@@ -1,0 +1,9 @@
+extend type pokemon {
+  trainerNotes: TrainerNotes
+}
+
+type TrainerNotes {
+  battleRole: String
+  careTip: String
+  signatureMoveIdea: String
+}

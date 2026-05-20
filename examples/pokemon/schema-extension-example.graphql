@@ -1,0 +1,14 @@
+query GetPokemonWithTrainerNotes($name: String!) {
+  pokemon(where: { name: { _eq: $name } }, limit: 1) {
+    id
+    name
+    height
+    weight
+    base_experience
+    trainerNotes @mock(hint: "concise trainer notes for a beginner-friendly Pokedex entry") {
+      battleRole
+      careTip
+      signatureMoveIdea
+    }
+  }
+}

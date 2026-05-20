@@ -1,0 +1,14 @@
+query GetKantoPokedex($limit: Int = 5) {
+  pokedex(where: { name: { _eq: "kanto" } }, limit: 1) {
+    id
+    name
+    is_main_series
+    pokemondexnumbers(limit: $limit, order_by: { pokedex_number: asc }) {
+      pokedex_number
+      pokemonspecy {
+        id
+        name @mock(hint: "invented regional variant Pokemon name")
+      }
+    }
+  }
+}
