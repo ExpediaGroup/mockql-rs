@@ -5,13 +5,15 @@
 ## Supported Providers
 
 - `github-copilot`
+- `gemini`
 
 ## Usage
 
 The HTTP provider is selected after the flat `oneshot` or `proxy` options. The `schema` subcommand does not use an LLM provider.
 
 ```bash
-mockql oneshot [flat options] http --provider <github-copilot> --model <model>
+mockql oneshot [flat options] http github-copilot --model <model>
+mockql oneshot [flat options] http gemini --url <url> --auth-header <header-name>
 ```
 
 ## GitHub Copilot
@@ -26,8 +28,20 @@ Content-Type: application/json
 
 If `GITHUB_TOKEN` is not set, `mockql` fails before making a request.
 
+## Gemini-compatible
+
+`mockql` sends a Gemini `generateContent` request to the provided URL:
+
+```text
+POST <url>
+<auth-header>: $AUTH_TOKEN
+Content-Type: application/json
+```
+
+For Google Gemini API, set `AUTH_TOKEN` to the API key and use `--auth-header x-goog-api-key`. For bearer-compatible endpoints, set `AUTH_TOKEN` to the full value, for example `Bearer <token>`, and use `--auth-header Authorization`.
+
 ## Security
 
-The `GITHUB_TOKEN` is sent as a Bearer token over HTTPS. Treat it like any other API credential. Do not commit it to source control or expose it in CI logs.
+HTTP provider credentials are sent over HTTPS. Treat them like any other API credential. Do not commit them to source control or expose them in CI logs.
 
 For the full provider notes, see [`docs/provider-http.md`](https://github.com/ExpediaGroup/mockql-rs/blob/main/docs/provider-http.md).

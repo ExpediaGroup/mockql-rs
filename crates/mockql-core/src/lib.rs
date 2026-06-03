@@ -47,6 +47,7 @@ pub use llm_provider::cli::CliProvider;
 pub use llm_provider::cli::CodexCliProvider;
 pub use llm_provider::cli::OpenCodeCliProvider;
 pub use llm_provider::http::HttpProvider;
+pub use llm_provider::http::gemini::GeminiCompatibleHttpProvider;
 pub use llm_provider::http::github_copilot::GithubCopilotHttpProvider;
 pub use planner::SplitError;
 pub use schema::IntrospectionError;

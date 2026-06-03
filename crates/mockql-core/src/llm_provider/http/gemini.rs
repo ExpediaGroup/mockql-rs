@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::GraphQLResponse;
-use crate::ProviderError;
 use crate::graphql::mock_response_prompt::MockResponsePrompt;
-use reqwest::Client;
+use crate::{GraphQLResponse, ProviderError};
+use reqwest::header::HeaderName;
+use reqwest::{Client, Url};
 use serde_json::json;
 use std::env;
 
-/// GitHub Copilot HTTP provider.
+/// Gemini Compatible Endpoint HTTP provider.
 #[derive(Debug, Clone)]
-pub struct GithubCopilotHttpProvider {
-  /// Model identifier forwarded to the GitHub Copilot request.
-  pub model: String,
+pub struct GeminiCompatibleHttpProvider {
+  /// Full endpoint URL.
+  pub url: Url,
+  /// Header name used for the auth value loaded from the static env var.
+  pub auth_header: HeaderName,
 }
 
-impl GithubCopilotHttpProvider {
-  const ENDPOINT: &str = "https://api.githubcopilot.com/chat/completions";
-  const TOKEN_ENV_VAR: &str = "GITHUB_TOKEN";
+impl GeminiCompatibleHttpProvider {
+  const TOKEN_ENV_VAR: &str = "AUTH_TOKEN";
 
   pub(crate) async fn run(
     &self,
@@ -36,14 +37,16 @@ impl GithubCopilotHttpProvider {
     client: &Client,
   ) -> Result<GraphQLResponse, ProviderError> {
     let token = env::var(Self::TOKEN_ENV_VAR).map_err(|_| ProviderError::MissingEnv(Self::TOKEN_ENV_VAR))?;
+
     let response = client
-      .post(Self::ENDPOINT)
-      .bearer_auth(token)
+      .post(self.url.clone())
+      .header(self.auth_header.clone(), token)
       .header("Content-Type", "application/json")
       .json(&json!({
-        "model": self.model,
-        "messages": [{ "role": "user", "content": prompt.to_markdown()? }],
-        "stream": false
+        "contents": [{
+          "role": "user",
+          "parts": [{ "text": prompt.to_markdown()? }]
+        }]
       }))
       .send()
       .await?;
@@ -61,16 +64,20 @@ impl GithubCopilotHttpProvider {
   fn parse_response(body: &str) -> Result<GraphQLResponse, ProviderError> {
     let payload: serde_json::Value = serde_json::from_str(body)?;
     let content = payload
-      .get("choices")
-      .and_then(|choices| choices.as_array())
-      .and_then(|choices| choices.first())
-      .and_then(|choice| choice.get("message"))
-      .and_then(|message| message.get("content"))
-      .and_then(|content| content.as_str())
-      .ok_or(ProviderError::MalformedResponse("choices[0].message.content"))?;
+      .get("candidates")
+      .and_then(|candidates| candidates.as_array())
+      .and_then(|candidates| candidates.first())
+      .and_then(|candidate| candidate.get("content"))
+      .and_then(|content| content.get("parts"))
+      .and_then(|parts| parts.as_array())
+      .and_then(|parts| {
+        parts
+          .iter()
+          .find_map(|part| part.get("text").and_then(|text| text.as_str()))
+      })
+      .ok_or(ProviderError::MalformedResponse("candidates[0].content.parts[0].text"))?;
 
-    let trimmed = content.trim();
-    GraphQLResponse::try_from(trimmed).map_err(ProviderError::InvalidJson)
+    GraphQLResponse::try_from(content.trim()).map_err(ProviderError::InvalidJson)
   }
 }
 
@@ -80,8 +87,18 @@ mod tests {
 
   #[test]
   fn parses_fixture_response() {
-    let response = GithubCopilotHttpProvider::parse_response(include_str!("mock-response.github-copilot.json"))
-      .expect("fixture should parse");
+    let body = json!({
+      "candidates": [{
+        "content": {
+          "parts": [{
+            "text": r#"{"data":{"allFilms":{"films":[{"director":"George Lucas"}]}}}"#
+          }]
+        }
+      }]
+    })
+    .to_string();
+
+    let response = GeminiCompatibleHttpProvider::parse_response(&body).expect("fixture should parse");
 
     let data = response.data.expect("response should contain data");
     assert_eq!(data["allFilms"]["films"][0]["director"], "George Lucas");
@@ -89,17 +106,17 @@ mod tests {
 
   #[test]
   fn rejects_missing_content() {
-    let body = json!({ "choices": [] }).to_string();
-    let error = GithubCopilotHttpProvider::parse_response(&body).unwrap_err();
+    let body = json!({ "candidates": [] }).to_string();
+    let error = GeminiCompatibleHttpProvider::parse_response(&body).unwrap_err();
     assert!(matches!(
       error,
-      ProviderError::MalformedResponse("choices[0].message.content")
+      ProviderError::MalformedResponse("candidates[0].content.parts[0].text")
     ));
   }
 
   #[test]
   fn rejects_invalid_json() {
-    let error = GithubCopilotHttpProvider::parse_response("{not json}").unwrap_err();
+    let error = GeminiCompatibleHttpProvider::parse_response("{not json}").unwrap_err();
     assert!(matches!(error, ProviderError::InvalidJson(_)));
   }
 }

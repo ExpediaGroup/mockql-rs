@@ -18,6 +18,7 @@ use clap::ValueEnum;
 use mockql_core::ClaudeCliProvider;
 use mockql_core::CliProvider;
 use mockql_core::CodexCliProvider;
+use mockql_core::GeminiCompatibleHttpProvider;
 use mockql_core::GithubCopilotHttpProvider;
 use mockql_core::Header;
 use mockql_core::HttpProvider;
@@ -25,6 +26,7 @@ use mockql_core::OpenCodeCliProvider;
 use mockql_core::ProviderConfig;
 use mockql_core::SerializationFormat;
 use reqwest::Client;
+use reqwest::Url;
 use reqwest::header::HeaderName;
 use reqwest::header::HeaderValue;
 use serde_json_bytes::ByteString;
@@ -53,16 +55,9 @@ pub(crate) enum TransportArg {
     )]
     model: String,
   },
-  /// Use an HTTP provider (github-copilot).
-  Http {
-    /// HTTP provider to use.
-    #[arg(long, value_enum)]
-    provider: HttpProviderArg,
-
-    /// Model name forwarded to the HTTP provider.
-    #[arg(long)]
-    model: String,
-  },
+  /// Use an HTTP provider.
+  #[command(subcommand)]
+  Http(HttpProviderArg),
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq)]
@@ -73,9 +68,24 @@ pub(crate) enum CliProviderArg {
   OpenCode,
 }
 
-#[derive(Debug, Clone, Copy, ValueEnum, PartialEq)]
+#[derive(Debug, Clone, Subcommand, PartialEq)]
 pub(crate) enum HttpProviderArg {
-  GithubCopilot,
+  /// GitHub Copilot HTTP provider.
+  GithubCopilot {
+    /// Model name forwarded to GitHub Copilot.
+    #[arg(long)]
+    model: String,
+  },
+  /// Gemini HTTP provider.
+  Gemini {
+    /// Full endpoint URL, example: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent.
+    /// the model name is specified in the url
+    #[arg(long, value_parser = clap::value_parser!(Url))]
+    url: Url,
+    /// Header name used for the auth value loaded from the provider env var.
+    #[arg(long, value_parser = clap::value_parser!(HeaderName))]
+    auth_header: HeaderName,
+  },
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -104,10 +114,12 @@ impl TransportArg {
         },
         timeout: *timeout,
       },
-      Self::Http { provider, model } => ProviderConfig::Http {
-        provider: match provider {
-          HttpProviderArg::GithubCopilot => HttpProvider::GithubCopilot(GithubCopilotHttpProvider { model }),
-        },
+      Self::Http(HttpProviderArg::GithubCopilot { model }) => ProviderConfig::Http {
+        provider: HttpProvider::GithubCopilot(GithubCopilotHttpProvider { model }),
+        client,
+      },
+      Self::Http(HttpProviderArg::Gemini { url, auth_header }) => ProviderConfig::Http {
+        provider: HttpProvider::Gemini(GeminiCompatibleHttpProvider { url, auth_header }),
         client,
       },
     }

@@ -5,43 +5,44 @@
 ## Supported Providers
 
 - `github-copilot`
+- `gemini`
 
-`mockql` sends an POST request to the provider's chat-completions endpoint and parses the response JSON.
+`github-copilot` sends an OpenAI-compatible chat-completions request. `gemini` sends a Gemini `generateContent` request to a user-provided Gemini or Gemini-compatible endpoint.
 
 ## Prerequisites
 
-- A valid API token for the provider must be set as an environment variable
-- The machine running `mockql` must have outbound HTTPS access to the provider endpoint
+- A valid API token for the provider must be set as an environment variable.
+- The machine running `mockql` must have outbound HTTPS access to the provider endpoint.
 
 ## Security Warning
 
-The `GITHUB_TOKEN` is sent as a Bearer token in the `Authorization` header over HTTPS. Treat this token with the same care as any other API credential. Do not commit it to source control or expose it in CI logs.
+HTTP provider credentials are sent over HTTPS. Treat these tokens with the same care as any other API credential. Do not commit them to source control or expose them in CI logs.
 
-## Model Selection
+## Provider Selection
 
 The HTTP provider is selected as a transport subcommand after the flat `oneshot` / `proxy` options. The `schema` subcommand does not use an LLM provider.
 
+```bash
+mockql oneshot [flat options] http github-copilot --model <model>
+mockql oneshot [flat options] http gemini --url <url> --auth-header <header-name>
 ```
-mockql oneshot [flat options] http --provider <github-copilot> --model <model>
-```
-
-- `--provider` is **required**
-- `--model` is **required**
 
 ## How `mockql` Uses Each Provider
 
 Verified against the current `mockql` source.
 
-| Need                          | GitHub Copilot                                                         | Notes                                                                             |
-|-------------------------------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| API endpoint                  | `https://api.githubcopilot.com/chat/completions`                       | OpenAI-compatible chat completions API.                                           |
-| Authentication                | `Authorization: Bearer $GITHUB_TOKEN`                                  | Token read from the `GITHUB_TOKEN` env var.                                       |
+| Need             | GitHub Copilot                                   | Gemini-compatible                                           |
+|------------------|--------------------------------------------------|-------------------------------------------------------------|
+| Provider command | `http github-copilot --model <model>`            | `http gemini --url <url> --auth-header <header-name>`       |
+| API endpoint     | `https://api.githubcopilot.com/chat/completions` | User-provided `--url`                                       |
+| Authentication   | `Authorization: Bearer $GITHUB_TOKEN`            | `<auth-header>: $AUTH_TOKEN`                                |
+| Response text    | `choices[0].message.content`                     | `candidates[0].content.parts[0].text`                       |
 
 ## Exact Requests `mockql` Executes
 
 ### GitHub Copilot
 
-```
+```text
 POST https://api.githubcopilot.com/chat/completions
 Authorization: Bearer $GITHUB_TOKEN
 Content-Type: application/json
@@ -55,7 +56,31 @@ Content-Type: application/json
 
 Notes:
 
-- If `GITHUB_TOKEN` is not set, `mockql` fails immediately with a `MissingEnv` error before making any request
+- If `GITHUB_TOKEN` is not set, `mockql` fails immediately with a `MissingEnv` error before making any request.
+
+### Gemini-compatible
+
+```text
+POST <url>
+<auth-header>: $AUTH_TOKEN
+Content-Type: application/json
+
+{
+  "contents": [
+    {
+      "role": "user",
+      "parts": [{ "text": "<prompt_markdown>" }]
+    }
+  ]
+}
+```
+
+Notes:
+
+- If `AUTH_TOKEN` is not set, `mockql` fails immediately with a `MissingEnv` error before making any request.
+- For Google Gemini API, set `AUTH_TOKEN` to the API key and use `--auth-header x-goog-api-key`.
+- For bearer-token compatible endpoints, set `AUTH_TOKEN` to the full header value, for example `Bearer <token>`, and use `--auth-header Authorization`.
+- The model is encoded in the Gemini endpoint URL, for example `/models/gemini-3.5-flash:generateContent`.
 
 ## Manual Provider Testing
 
@@ -69,5 +94,16 @@ curl -s https://api.githubcopilot.com/chat/completions \
   -H "Content-Type: application/json" \
   -d "$(jq -n --arg prompt "$(cat ./docs/prompt-example.md)" --arg model "gemini-3-flash-preview" \
     '{model: $model, messages: [{role: "user", content: $prompt}], stream: false}')" \
+  | jq
+```
+
+### Gemini-compatible
+
+```bash
+curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent" \
+  -H "x-goog-api-key: $AUTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "$(jq -n --arg prompt "$(cat ./docs/prompt-example.md)" \
+    '{contents: [{role: "user", parts: [{text: $prompt}]}]}')" \
   | jq
 ```
