@@ -1,0 +1,9 @@
+query Films @mock(hint: "3 original Star Wars trilogy films: real title, director, releaseDate as YYYY-MM-DD") {
+  allFilms {
+    films {
+      title
+      director
+      releaseDate
+    }
+  }
+}
