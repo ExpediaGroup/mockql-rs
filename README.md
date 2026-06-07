@@ -1,111 +1,84 @@
-# MockQL Rust
+# mockql
 
-Gen AI GraphQL response mocking via `@mock` directive.
+Focus on the feature, not the fixture. GenAI-powered GraphQL response mocking via the `@mock` directive.
 
-## 📋 Specification
+`mockql` is a thin, composable and standalone CLI that **decorates** any GraphQL server. 
+A CLI is the smallest possible integration surface: any language, agent, script, or demo environment can run a process.
 
-The `@mock` directive specification lives in [`docs/mock-specification.md`](./docs/mock-specification.md).
-
-## 🎯 What It Does
-
-`mockql` lets you annotate a GraphQL operation with `@mock` and generate only the mocked portions with an LLM provider.
-The upstream GraphQL server does not need to define the `@mock` directive. `mockql` decorates the schema with it automatically while loading it (locally or via introspection).
-
-Depending on where `@mock` appears, `mockql` will:
-
-- Pass the operation straight through to the upstream GraphQL server
-- Generate the full response with an LLM provider
-- Fetch real upstream data for non-mocked fields, then merge in generated mock data for mocked fields
-
-## 📦 Workspace Layout
-
-- [`crates/mockql-core`](./crates/mockql-core): Core crate
-- [`crates/mockql-cli`](./crates/mockql-cli): CLI crate and `mockql` binary
-- [`docs/mock-specification.md`](./docs/mock-specification.md): `@mock` directive semantics
-- [`docs/provider-cli.md`](./docs/provider-cli.md): provider prerequisites and exact CLI integration details
-- [`docs/provider-http.md`](./docs/provider-http.md): provider prerequisites and exact CLI integration details
-- [`examples/swapi`](./examples/swapi): SWAPI GraphQL examples
-- [`examples/countries`](./examples/countries): Countries GraphQL examples
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-APACHE)
+[![crates.io](https://img.shields.io/crates/v/mockql-cli.svg)](https://crates.io/crates/mockql-cli)
 
 ## 📜 Prerequisites
-
 - One supported provider CLI installed and available on `PATH`
-  - `claude`
-  - `codex`
-  - `opencode`
+    - `claude`
+    - `codex`
+    - `opencode`
 - Or an HTTP-backed provider with credentials.
-  - `github-copilot` (requires `GITHUB_TOKEN` env variable)
+    - `github-copilot` (requires `GITHUB_TOKEN` env variable)
+    - `gemini` (requires `AUTH_TOKEN` env variable)
 
-## 🔨 Build
+## Demo
 
-```bash
-cargo build -p mockql
-```
+All use cases below use the public SWAPI GraphQL endpoint at <https://swapi-graphql.netlify.app>.
 
-Run the binary with:
+### Contextual field mocking
 
-```bash
-cargo run -p mockql-cli -- --help
-```
+The real power shows up when you need *most* of a response from your actual backend, but one field isn't ready yet: 
+Fetch real data like film `title` while mocking fields like `openingCrawl` and `director` in [`partial-list-items.graphql`](examples/swapi/partial-list-items.graphql).
 
-Or directly after building:
+![Partial list items demo](examples/swapi/partial-list-items.gif)
 
-```bash
-./target/debug/mockql --help
-```
+### Full mock
 
-## ⌨️ Usage
+Generate the full operation response from the provider  in [`full-mock.graphql`](examples/swapi/full-mock.graphql).
 
+![Full mock demo](examples/swapi/full-mock.gif)
 
-### oneshot
-Execute a single GraphQL operation and print the response to stdout.
-```bash
-mockql oneshot --operation <file.graphql> --graphql-url <https://example.com/graphql> [options] cli|http
-```
+### Nested object fields
 
-### proxy
-start an HTTP proxy server that listens for GraphQL requests, exposing a graphiql interface at `http://localhost:<port>/graphiql`.
-```bash
-mockql proxy --port <port> --graphql-url <https://example.com/graphql> [options] cli|http
-```
+Mock fields deep inside nested character data while preserving the real film query shape in [`nested-object-fields.graphql`](examples/swapi/nested-object-fields.graphql).
 
-### schema
-Load and print the decorated GraphQL schema with `@mock` directive
-```bash
-mockql schema (--schema <schema.graphql> | --graphql-url <https://example.com/graphql>) [options]
-```
+![Nested object fields demo](examples/swapi/nested-object-fields.gif)
 
-## Quick Start Examples
+### Schema extension
 
-### SWAPI
+Fetch real film data and `@mock` an extended `productionBrief` field in [`schema-extension-example.graphql`](examples/swapi/schema-extension-example.graphql).
 
-```bash
-cargo run -p mockql-cli -- oneshot \
-  --operation ./examples/swapi/partial-list-items.graphql \
-  --variables ./examples/swapi/partial-list-items.json \
-  --graphql-url https://swapi-graphql.netlify.app/graphql \
-  cli --provider codex --model gpt-5.4-mini
-```
+![Schema extension demo](examples/swapi/schema-extension.gif)
+
+## How it works
+
+![How mockql turns @mock into one GraphQL response](docs/assets/mockql-sequence.png)
+
+`mockql` sits between your client and server as a thin layer. For every request it will:
+
+- **Parse** — the operation is parsed and validated against your schema using [apollo-compiler](https://crates.io/crates/apollo-compiler).
+- **Split** — `@mock`-annotated fields are separated from real fields. Real fields are forwarded upstream as normal. (If you know GraphQL Federation, this feels a lot like query planning.)
+- **Prompt** — the operation, mocked fields, hints, and the relevant schema subset are assembled into a structured prompt. The operation and schema constrain the output shape: the LLM can't hallucinate fields that don't exist or return a string where an enum is expected.
+- **Merge** — real upstream data and LLM-generated mock data are stitched back into a single response.
+
+## Install
+
+Install the `mockql` binary with Cargo:
 
 ```bash
-cargo run -p mockql-cli -- oneshot \
-  --operation ./examples/swapi/partial-list-items.graphql \
-  --variables ./examples/swapi/partial-list-items.json \
-  --graphql-url https://swapi-graphql.netlify.app/graphql \
-  cli --provider opencode --model github-copilot/gemini-3-flash-preview
+cargo install mockql-cli
 ```
 
-### Countries API
+Or download a prebuilt binary from the [releases page](https://github.com/ExpediaGroup/mockql-rs/releases).
 
-```bash
-cargo run -p mockql-cli -- oneshot \
-  --operation ./examples/countries/contextual-hint.graphql \
-  --variables ./examples/countries/contextual-hint.json \
-  --graphql-url https://countries.trevorblades.com/ \
-  cli --provider codex --model gpt-5.4-mini
-```
+You also need **one** LLM provider:
 
-For more example commands, see:
+- **CLI** on your `PATH`, already authenticated: `claude`, `codex`, or `opencode`.
+- **HTTP** with credentials: `github-copilot` (`GITHUB_TOKEN`) or `gemini` (`AUTH_TOKEN`).
 
-- [`examples/swapi/README.md`](./examples/swapi/README.md)
-- [`examples/countries/README.md`](./examples/countries/README.md)
+## Documentation
+
+- [Getting started](https://opensource.expediagroup.com/mockql-rs)
+- [`@mock` directive specification](docs/mock-specification.md)
+
+## Examples
+
+- [`swapi`](examples/swapi/README.md)
+- [`countries`](examples/countries/README.md)
+- [`pokemon`](examples/pokemon/README.md)

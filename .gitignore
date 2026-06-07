@@ -4,6 +4,7 @@
 *.iml
 *.ipr
 .DS_Store
+.claude
 
 /target/
 *.profraw
@@ -18,3 +19,5 @@ prompt.dbg.txt
 # .lldb debug alias
 .lldbinit
 megalinter-reports/
+examples/**/*/mockql
+examples/**/*.tape

@@ -53,3 +53,166 @@ pub(crate) struct ProxyArgs {
   #[command(subcommand)]
   pub(super) transport: TransportArg,
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::Commands;
+  use crate::MockQLCli;
+  use crate::commands::shared::HttpProviderArg;
+  use crate::commands::shared::SerializationFormatArg;
+  use crate::commands::shared::TransportArg;
+  use clap::Parser;
+  use clap::error::ErrorKind;
+  use reqwest::header::HeaderName;
+  use reqwest::header::HeaderValue;
+  use std::time::Duration;
+
+  #[test]
+  fn proxy_requires_port() {
+    let result = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "cli",
+      "--provider",
+      "codex",
+    ]);
+    assert_eq!(result.unwrap_err().kind(), ErrorKind::MissingRequiredArgument);
+  }
+
+  #[test]
+  fn proxy_requires_graphql_url() {
+    let result = MockQLCli::try_parse_from(["mockql", "proxy", "--port", "8080", "cli", "--provider", "codex"]);
+    assert_eq!(result.unwrap_err().kind(), ErrorKind::MissingRequiredArgument);
+  }
+
+  #[test]
+  fn proxy_rejects_an_invalid_graphql_url() {
+    let result = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--port",
+      "8080",
+      "--graphql-url",
+      "not-a-url",
+      "cli",
+      "--provider",
+      "codex",
+    ]);
+    assert_eq!(result.unwrap_err().kind(), ErrorKind::ValueValidation);
+  }
+
+  #[test]
+  fn proxy_defaults_model_for_claude() {
+    let app = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--port",
+      "8080",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "cli",
+      "--provider",
+      "claude",
+    ])
+    .unwrap();
+
+    let Commands::Proxy(args) = app.command else {
+      panic!("expected to parse proxy command");
+    };
+    let TransportArg::Cli { model, .. } = args.transport else {
+      panic!("expected cli transport variant");
+    };
+    assert_eq!(model, "sonnet");
+  }
+
+  #[test]
+  fn proxy_parses_introspection_headers_timeout_and_format() {
+    let app = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--port",
+      "8080",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "--introspection-header",
+      "client-info:test",
+      "--timeout",
+      "30s",
+      "--format",
+      "toon",
+      "cli",
+      "--provider",
+      "codex",
+    ])
+    .unwrap();
+
+    let Commands::Proxy(args) = app.command else {
+      panic!("expected to parse proxy command");
+    };
+    assert_eq!(args.port, 8080);
+    assert_eq!(args.graphql_url.as_str(), "https://example.com/graphql");
+    assert_eq!(args.introspection_headers.len(), 1);
+    assert_eq!(args.introspection_headers[0].0, HeaderName::from_static("client-info"));
+    assert_eq!(args.introspection_headers[0].1, HeaderValue::from_static("test"));
+    assert_eq!(args.timeout, Duration::from_secs(30));
+    assert!(matches!(args.format, SerializationFormatArg::Toon));
+  }
+
+  #[test]
+  fn proxy_http_parses_github_copilot_provider() {
+    let app = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--port",
+      "8080",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "http",
+      "github-copilot",
+      "--model",
+      "gpt-5",
+    ])
+    .unwrap();
+
+    let Commands::Proxy(args) = app.command else {
+      panic!("expected to parse proxy command");
+    };
+    let TransportArg::Http(HttpProviderArg::GithubCopilot { model }) = args.transport else {
+      panic!("expected GitHub Copilot HTTP provider");
+    };
+    assert_eq!(model, "gpt-5");
+  }
+
+  #[test]
+  fn proxy_http_parses_gemini_compatible() {
+    let app = MockQLCli::try_parse_from([
+      "mockql",
+      "proxy",
+      "--port",
+      "8080",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "http",
+      "gemini",
+      "--url",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+      "--auth-header",
+      "x-goog-api-key",
+    ])
+    .unwrap();
+
+    let Commands::Proxy(args) = app.command else {
+      panic!("expected to parse proxy command");
+    };
+    let TransportArg::Http(HttpProviderArg::Gemini { url, auth_header }) = args.transport else {
+      panic!("expected Gemini compatible endpoint HTTP provider");
+    };
+    assert_eq!(
+      url.as_str(),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
+    );
+    assert_eq!(auth_header, HeaderName::from_static("x-goog-api-key"));
+  }
+}

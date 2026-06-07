@@ -69,6 +69,7 @@ pub(crate) struct OneshotArgs {
 mod tests {
   use crate::Commands;
   use crate::MockQLCli;
+  use crate::commands::shared::HttpProviderArg;
   use crate::commands::shared::TransportArg;
   use crate::commands::shared::parse_header;
   use clap::Parser;
@@ -212,7 +213,6 @@ mod tests {
       "--graphql-url",
       "https://example.com/graphql",
       "http",
-      "--provider",
       "github-copilot",
     ]);
     assert_eq!(result.unwrap_err().kind(), ErrorKind::MissingRequiredArgument);
@@ -228,7 +228,6 @@ mod tests {
       "--graphql-url",
       "https://example.com/graphql",
       "http",
-      "--provider",
       "github-copilot",
       "--model",
       "gpt-5",
@@ -238,9 +237,40 @@ mod tests {
     let Commands::Oneshot(args) = app.command else {
       panic!("expected to parse oneshot command");
     };
-    let TransportArg::Http { model, .. } = args.transport else {
-      panic!("expected http transport variant");
+    let TransportArg::Http(HttpProviderArg::GithubCopilot { model }) = args.transport else {
+      panic!("expected GitHub Copilot HTTP provider");
     };
     assert_eq!(model, "gpt-5");
+  }
+
+  #[test]
+  fn oneshot_http_parses_gemini_compatible() {
+    let app = MockQLCli::try_parse_from([
+      "mockql",
+      "oneshot",
+      "--operation",
+      "op.graphql",
+      "--graphql-url",
+      "https://example.com/graphql",
+      "http",
+      "gemini",
+      "--url",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+      "--auth-header",
+      "x-goog-api-key",
+    ])
+    .unwrap();
+
+    let Commands::Oneshot(args) = app.command else {
+      panic!("expected to parse oneshot command");
+    };
+    let TransportArg::Http(HttpProviderArg::Gemini { url, auth_header }) = args.transport else {
+      panic!("expected Gemini compatible endpoint HTTP provider");
+    };
+    assert_eq!(
+      url.as_str(),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
+    );
+    assert_eq!(auth_header, HeaderName::from_static("x-goog-api-key"));
   }
 }

@@ -32,15 +32,17 @@ mockql oneshot [command options] cli --provider <claude|codex|opencode> [--model
 
 ## HTTP Provider
 
-Use `http` when you want MockQL to call an HTTP provider. The supported HTTP provider is `github-copilot`, which requires `GITHUB_TOKEN`.
+Use `http` when you want MockQL to call an HTTP provider. Supported HTTP providers are `github-copilot` and `gemini`.
 
 ```bash
 mockql oneshot \
   --operation ./examples/swapi/partial-list-items.graphql \
   --variables ./examples/swapi/partial-list-items.json \
   --graphql-url https://swapi-graphql.netlify.app/graphql \
-  http --provider github-copilot --model gpt-5.4-mini
+  http github-copilot --model gpt-5.4-mini
 ```
+
+Set `GITHUB_TOKEN` before using `github-copilot`.
 
 ## Mocking Fields Outside The Schema
 
@@ -68,10 +70,13 @@ mockql oneshot \
   --variables ./schema-extension-example.json \
   --schema-extension ./schema-extension.graphql \
   --graphql-url https://swapi-graphql.netlify.app/graphql \
-  http --provider github-copilot --model gemini-3.5-flash
+  http gemini \
+    --url https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent \
+    --auth-header x-goog-api-key
 ```
 
 Because `productionBrief` is not resolved by SWAPI, it should be selected with `@mock`.
+Set `AUTH_TOKEN` before using `gemini`; for Google Gemini API, `AUTH_TOKEN` is the API key.
 
 ## Options
 

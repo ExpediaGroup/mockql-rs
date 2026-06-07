@@ -15,10 +15,12 @@
 use crate::GraphQLResponse;
 use crate::ProviderError;
 use crate::graphql::mock_response_prompt::MockResponsePrompt;
+use crate::llm_provider::http::gemini::GeminiCompatibleHttpProvider;
 use crate::llm_provider::http::github_copilot::GithubCopilotHttpProvider;
 use reqwest::Client;
 use std::env;
 
+pub mod gemini;
 pub mod github_copilot;
 
 /// Supported HTTP provider variants.
@@ -26,6 +28,8 @@ pub mod github_copilot;
 pub enum HttpProvider {
   /// GitHub Copilot HTTP provider.
   GithubCopilot(GithubCopilotHttpProvider),
+  /// Gemini-compatible HTTP provider.
+  Gemini(GeminiCompatibleHttpProvider),
 }
 
 impl HttpProvider {
@@ -41,6 +45,7 @@ impl HttpProvider {
     }
     match self {
       Self::GithubCopilot(github_copilot) => github_copilot.run(prompt, client).await,
+      Self::Gemini(gemini) => gemini.run(prompt, client).await,
     }
   }
 }
