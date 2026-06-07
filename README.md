@@ -1,7 +1,8 @@
 # mockql
 
 Focus on the feature, not the fixture. GenAI-powered GraphQL response mocking via the `@mock` directive.
-`mockql` It's a thin, composable, standalone CLI that decorates any GraphQL server. 
+
+`mockql` is a thin, composable and standalone CLI that **decorates** any GraphQL server. 
 A CLI is the smallest possible integration surface: any language, agent, script, or demo environment can run a process.
 
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-APACHE)
