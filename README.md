@@ -8,14 +8,33 @@ A CLI is the smallest possible integration surface: any language, agent, script,
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-APACHE)
 [![crates.io](https://img.shields.io/crates/v/mockql-cli.svg)](https://crates.io/crates/mockql-cli)
 
-## 📜 Prerequisites
+## Prerequisites
 - One supported provider CLI installed and available on `PATH`
     - `claude`
     - `codex`
     - `opencode`
 - Or an HTTP-backed provider with credentials.
-    - `github-copilot` (requires `GITHUB_TOKEN` env variable)
-    - `gemini` (requires `AUTH_TOKEN` env variable)
+    - `github-copilot`
+    - `gemini`
+
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ExpediaGroup/mockql-rs/main/install | sh
+```
+
+Pin a version or choose a different install directory with environment variables:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ExpediaGroup/mockql-rs/main/install | MOCKQL_VERSION=v0.0.4 sh
+curl -fsSL https://raw.githubusercontent.com/ExpediaGroup/mockql-rs/main/install | MOCKQL_INSTALL_DIR="$HOME/bin" sh
+```
+
+Install with Cargo
+
+```bash
+cargo install mockql-cli
+```
 
 ## Demo
 
@@ -56,21 +75,6 @@ Fetch real film data and `@mock` an extended `productionBrief` field in [`schema
 - **Split** — `@mock`-annotated fields are separated from real fields. Real fields are forwarded upstream as normal. (If you know GraphQL Federation, this feels a lot like query planning.)
 - **Prompt** — the operation, mocked fields, hints, and the relevant schema subset are assembled into a structured prompt. The operation and schema constrain the output shape: the LLM can't hallucinate fields that don't exist or return a string where an enum is expected.
 - **Merge** — real upstream data and LLM-generated mock data are stitched back into a single response.
-
-## Install
-
-Install the `mockql` binary with Cargo:
-
-```bash
-cargo install mockql-cli
-```
-
-Or download a prebuilt binary from the [releases page](https://github.com/ExpediaGroup/mockql-rs/releases).
-
-You also need **one** LLM provider:
-
-- **CLI** on your `PATH`, already authenticated: `claude`, `codex`, or `opencode`.
-- **HTTP** with credentials: `github-copilot` (`GITHUB_TOKEN`) or `gemini` (`AUTH_TOKEN`).
 
 ## Documentation
 

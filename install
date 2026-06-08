@@ -1,0 +1,142 @@
+#!/bin/sh
+set -eu
+
+repo="ExpediaGroup/mockql-rs"
+binary="mockql"
+
+say() {
+  printf '%s\n' "$1"
+}
+
+fail() {
+  printf 'error: %s\n' "$1" >&2
+  exit 1
+}
+
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1 || fail "missing required command: $1"
+}
+
+detect_target() {
+  os="$(uname -s)"
+  arch="$(uname -m)"
+
+  case "${os}:${arch}" in
+    Linux:x86_64 | Linux:amd64)
+      printf '%s\n' "x86_64-unknown-linux-gnu"
+      ;;
+    Linux:aarch64 | Linux:arm64)
+      printf '%s\n' "aarch64-unknown-linux-gnu"
+      ;;
+    Darwin:x86_64)
+      printf '%s\n' "x86_64-apple-darwin"
+      ;;
+    Darwin:arm64 | Darwin:aarch64)
+      printf '%s\n' "aarch64-apple-darwin"
+      ;;
+    *)
+      fail "unsupported platform: ${os} ${arch}"
+      ;;
+  esac
+}
+
+resolve_version() {
+  if [ -n "${MOCKQL_VERSION:-}" ]; then
+    case "${MOCKQL_VERSION}" in
+      v*) printf '%s\n' "${MOCKQL_VERSION}" ;;
+      *) printf 'v%s\n' "${MOCKQL_VERSION}" ;;
+    esac
+    return
+  fi
+
+  latest_url="https://github.com/${repo}/releases/latest"
+  effective_url="$(curl --proto '=https' --tlsv1.2 -fsSL -o /dev/null -w '%{url_effective}' "${latest_url}")" \
+    || fail "failed to resolve latest release"
+  version="${effective_url##*/}"
+
+  case "${version}" in
+    v*) printf '%s\n' "${version}" ;;
+    *) fail "failed to resolve latest release version from ${effective_url}" ;;
+  esac
+}
+
+install_dir() {
+  if [ -n "${MOCKQL_INSTALL_DIR:-}" ]; then
+    printf '%s\n' "${MOCKQL_INSTALL_DIR}"
+    return
+  fi
+
+  [ -n "${HOME:-}" ] || fail "HOME is not set; set MOCKQL_INSTALL_DIR"
+  printf '%s\n' "${HOME}/.local/bin"
+}
+
+sha256_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | sed 's/[[:space:]].*$//'
+    return
+  fi
+
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | sed 's/[[:space:]].*$//'
+    return
+  fi
+
+  fail "missing required command: sha256sum or shasum"
+}
+
+verify_checksum() {
+  archive_name="$1"
+  archive_path="$2"
+  checksum_path="$3"
+
+  expected="$(grep "${archive_name}" "${checksum_path}" | sed -n '1s/[[:space:]].*$//p')"
+  [ -n "${expected}" ] || fail "checksum for ${archive_name} was not found"
+
+  actual="$(sha256_file "${archive_path}")"
+  [ "${expected}" = "${actual}" ] || fail "checksum mismatch for ${archive_name}"
+}
+
+need_cmd curl
+need_cmd grep
+need_cmd mkdir
+need_cmd mktemp
+need_cmd sed
+need_cmd tar
+need_cmd uname
+
+target="$(detect_target)"
+version="$(resolve_version)"
+destination="$(install_dir)"
+archive_name="mockql-rs-${version}-${target}.tar.gz"
+release_url="https://github.com/${repo}/releases/download/${version}"
+
+tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t mockql-install)"
+trap 'rm -rf "${tmpdir}"' 0 HUP INT TERM
+
+archive_path="${tmpdir}/${archive_name}"
+checksum_path="${tmpdir}/sha256sums.txt"
+
+say "Installing ${binary} ${version} for ${target}"
+curl --proto '=https' --tlsv1.2 -fsSL -o "${archive_path}" "${release_url}/${archive_name}" \
+  || fail "failed to download ${archive_name}"
+curl --proto '=https' --tlsv1.2 -fsSL -o "${checksum_path}" "${release_url}/sha256sums.txt" \
+  || fail "failed to download sha256sums.txt"
+
+verify_checksum "${archive_name}" "${archive_path}" "${checksum_path}"
+tar -xzf "${archive_path}" -C "${tmpdir}"
+
+binary_path="${tmpdir}/mockql-rs-${version}-${target}/${binary}"
+[ -f "${binary_path}" ] || fail "release archive did not contain ${binary}"
+
+mkdir -p "${destination}"
+cp "${binary_path}" "${destination}/${binary}"
+chmod 755 "${destination}/${binary}"
+
+say "Installed ${binary} to ${destination}/${binary}"
+
+case ":${PATH:-}:" in
+  *:"${destination}":*) ;;
+  *)
+    say "Add ${destination} to PATH to run ${binary} from any directory."
+    ;;
+esac

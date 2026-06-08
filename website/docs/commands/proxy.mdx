@@ -23,6 +23,8 @@ The proxy exposes:
 
 ## CLI Provider
 
+Use `cli` when you want MockQL to call an installed assistant CLI. CLI provider setup and defaults are documented in [CLI Providers](../provider-cli.md).
+
 ```bash
 mockql proxy \
   --port 4000 \
@@ -34,16 +36,16 @@ Open `http://localhost:4000/graphiql`
 
 ## HTTP Provider
 
+Use `http` when you want MockQL to call an HTTP provider. HTTP provider setup, flags, and authentication are documented in [HTTP Providers](../provider-http.md).
+
 ```bash
 mockql proxy \
   --port 4000 \
   --graphql-url https://swapi-graphql.netlify.app/graphql \
-  http github-copilot --model gpt-5.4-mini
+  http <provider> [provider options]
 ```
 
 Open `http://localhost:4000/graphiql`
-
-Set `GITHUB_TOKEN` before using the `github-copilot` HTTP provider. For Gemini-compatible endpoints, use `http gemini --url <url> --auth-header <header-name>` and set `AUTH_TOKEN`.
 
 ## Options
 
@@ -55,13 +57,3 @@ Set `GITHUB_TOKEN` before using the `github-copilot` HTTP provider. For Gemini-c
 | `--introspection-header <INTROSPECTION_HEADERS>` | Additional headers to include in the introspection query if no local schema was provided. Specify as `name:value`; repeat the flag for multiple headers. |
 | `--timeout <TIMEOUT>`                            | Timeout for provider execution, e.g. `30s` or `2m`. Default: `1m`.                                                                                       |
 | `--format <FORMAT>`                              | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`.                                                     |
-
-Provider options come after `cli` or `http`:
-
-```bash
-mockql proxy [command options] cli --provider <claude|codex|opencode> [--model <model>]
-mockql proxy [command options] http github-copilot --model <model>
-mockql proxy [command options] http gemini --url <url> --auth-header <header-name>
-```
-
-See the [shared command options reference](../reference/command-options.mdx) for all command flags in one place.

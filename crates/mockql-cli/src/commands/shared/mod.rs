@@ -85,6 +85,9 @@ pub(crate) enum HttpProviderArg {
     /// Header name used for the auth value loaded from the provider env var.
     #[arg(long, value_parser = clap::value_parser!(HeaderName))]
     auth_header: HeaderName,
+    /// Environment variable name used to load the auth value.
+    #[arg(long, default_value = "GEMINI_AUTH_VALUE")]
+    auth_value_env_var: String,
   },
 }
 
@@ -118,8 +121,16 @@ impl TransportArg {
         provider: HttpProvider::GithubCopilot(GithubCopilotHttpProvider { model }),
         client,
       },
-      Self::Http(HttpProviderArg::Gemini { url, auth_header }) => ProviderConfig::Http {
-        provider: HttpProvider::Gemini(GeminiCompatibleHttpProvider { url, auth_header }),
+      Self::Http(HttpProviderArg::Gemini {
+        url,
+        auth_header,
+        auth_value_env_var,
+      }) => ProviderConfig::Http {
+        provider: HttpProvider::Gemini(GeminiCompatibleHttpProvider {
+          url,
+          auth_header,
+          auth_value_env_var,
+        }),
         client,
       },
     }

@@ -24,19 +24,20 @@ use std::env;
 pub struct GeminiCompatibleHttpProvider {
   /// Full endpoint URL.
   pub url: Url,
-  /// Header name used for the auth value loaded from the static env var.
+  /// Header name used for the auth value.
   pub auth_header: HeaderName,
+  /// Environment variable name used to load the auth value.
+  pub auth_value_env_var: String,
 }
 
 impl GeminiCompatibleHttpProvider {
-  const TOKEN_ENV_VAR: &str = "AUTH_TOKEN";
-
   pub(crate) async fn run(
     &self,
     prompt: &MockResponsePrompt,
     client: &Client,
   ) -> Result<GraphQLResponse, ProviderError> {
-    let token = env::var(Self::TOKEN_ENV_VAR).map_err(|_| ProviderError::MissingEnv(Self::TOKEN_ENV_VAR))?;
+    let token =
+      env::var(&self.auth_value_env_var).map_err(|_| ProviderError::MissingEnv(self.auth_value_env_var.clone()))?;
 
     let response = client
       .post(self.url.clone())
