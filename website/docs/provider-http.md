@@ -13,7 +13,7 @@ The HTTP provider is selected after the flat `oneshot` or `proxy` options. The `
 
 ```bash
 mockql oneshot [flat options] http github-copilot --model <model>
-mockql oneshot [flat options] http gemini --url <url> --auth-header <header-name>
+mockql oneshot [flat options] http gemini --url <url> --auth-header <header-name> [--auth-value-env-var <env-var>]
 ```
 
 ## GitHub Copilot
@@ -34,11 +34,11 @@ If `GITHUB_TOKEN` is not set, `mockql` fails before making a request.
 
 ```text
 POST <url>
-<auth-header>: $AUTH_TOKEN
+<auth-header>: $<auth-value-env-var>
 Content-Type: application/json
 ```
 
-For Google Gemini API, set `AUTH_TOKEN` to the API key and use `--auth-header x-goog-api-key`. For bearer-compatible endpoints, set `AUTH_TOKEN` to the full value, for example `Bearer <token>`, and use `--auth-header Authorization`.
+`--auth-value-env-var` defaults to `GEMINI_AUTH_VALUE`. For Google Gemini API, set the configured auth token environment variable to the API key and use `--auth-header x-goog-api-key`. For bearer-compatible endpoints, set the configured auth token environment variable to the full value, for example `Bearer <token>`, and use `--auth-header Authorization`.
 
 ## Security
 

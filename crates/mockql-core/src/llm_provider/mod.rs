@@ -56,7 +56,7 @@ pub enum ProviderError {
   Request(String),
   /// A required environment variable was not set.
   #[error("missing environment variable: {0}")]
-  MissingEnv(&'static str),
+  MissingEnv(String),
   /// HTTP transport failure while invoking an HTTP provider.
   #[error(transparent)]
   Http(#[from] reqwest::Error),

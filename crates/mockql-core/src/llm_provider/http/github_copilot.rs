@@ -35,7 +35,8 @@ impl GithubCopilotHttpProvider {
     prompt: &MockResponsePrompt,
     client: &Client,
   ) -> Result<GraphQLResponse, ProviderError> {
-    let token = env::var(Self::TOKEN_ENV_VAR).map_err(|_| ProviderError::MissingEnv(Self::TOKEN_ENV_VAR))?;
+    let token =
+      env::var(Self::TOKEN_ENV_VAR).map_err(|_| ProviderError::MissingEnv(Self::TOKEN_ENV_VAR.to_string()))?;
     let response = client
       .post(Self::ENDPOINT)
       .bearer_auth(token)

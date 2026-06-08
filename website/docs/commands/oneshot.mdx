@@ -14,7 +14,7 @@ mockql oneshot [OPTIONS] --operation <OPERATION> --graphql-url <GRAPHQL_URL> <CO
 
 ## CLI Provider
 
-Use `cli` when you want MockQL to call an installed assistant CLI such as `claude`, `codex`, or `opencode`.
+Use `cli` when you want MockQL to call an installed assistant CLI.
 
 ```bash
 mockql oneshot \
@@ -24,25 +24,21 @@ mockql oneshot \
   cli --provider codex --model gpt-5.4-mini
 ```
 
-The provider transport and provider options come after the `oneshot` options:
+The provider transport and provider options come after the `oneshot` options. CLI provider setup and defaults are documented in [CLI Providers](../provider-cli.md).
 
 ```bash
-mockql oneshot [command options] cli --provider <claude|codex|opencode> [--model <model>]
+mockql oneshot [command options] cli --provider <provider> [provider options]
 ```
 
 ## HTTP Provider
 
-Use `http` when you want MockQL to call an HTTP provider. Supported HTTP providers are `github-copilot` and `gemini`.
+Use `http` when you want MockQL to call an HTTP provider.
 
 ```bash
-mockql oneshot \
-  --operation ./examples/swapi/partial-list-items.graphql \
-  --variables ./examples/swapi/partial-list-items.json \
-  --graphql-url https://swapi-graphql.netlify.app/graphql \
-  http github-copilot --model gpt-5.4-mini
+mockql oneshot [command options] http <provider> [provider options]
 ```
 
-Set `GITHUB_TOKEN` before using `github-copilot`.
+HTTP provider setup, flags, and authentication are documented in [HTTP Providers](../provider-http.md).
 
 ## Mocking Fields Outside The Schema
 
@@ -70,13 +66,10 @@ mockql oneshot \
   --variables ./schema-extension-example.json \
   --schema-extension ./schema-extension.graphql \
   --graphql-url https://swapi-graphql.netlify.app/graphql \
-  http gemini \
-    --url https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent \
-    --auth-header x-goog-api-key
+  cli --provider codex --model gpt-5.4-mini
 ```
 
 Because `productionBrief` is not resolved by SWAPI, it should be selected with `@mock`.
-Set `AUTH_TOKEN` before using `gemini`; for Google Gemini API, `AUTH_TOKEN` is the API key.
 
 ## Options
 
@@ -91,5 +84,3 @@ Set `AUTH_TOKEN` before using `gemini`; for Google Gemini API, `AUTH_TOKEN` is t
 | `--graphql-header <GRAPHQL_HEADERS>`    | Additional headers to include in GraphQL requests. Specify as `name:value`; repeat the flag for multiple headers. |
 | `--timeout <TIMEOUT>`                   | Timeout for provider execution, e.g. `30s` or `2m`. Default: `1m`.                                                |
 | `--format <FORMAT>`                     | Serialization format for the mock response prompt. Possible values: `json`, `toon`. Default: `json`.              |
-
-See the [shared command options reference](../reference/command-options.mdx) for all command flags in one place.

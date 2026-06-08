@@ -264,7 +264,12 @@ mod tests {
     let Commands::Oneshot(args) = app.command else {
       panic!("expected to parse oneshot command");
     };
-    let TransportArg::Http(HttpProviderArg::Gemini { url, auth_header }) = args.transport else {
+    let TransportArg::Http(HttpProviderArg::Gemini {
+      url,
+      auth_header,
+      auth_value_env_var,
+    }) = args.transport
+    else {
       panic!("expected Gemini compatible endpoint HTTP provider");
     };
     assert_eq!(
@@ -272,5 +277,6 @@ mod tests {
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
     );
     assert_eq!(auth_header, HeaderName::from_static("x-goog-api-key"));
+    assert_eq!(auth_value_env_var, "GEMINI_AUTH_VALUE");
   }
 }

@@ -7,6 +7,6 @@ module.exports = {
       "commands/schema"
     ],
     Providers: ["provider-cli", "provider-http"],
-    Reference: ["mock-specification", "reference/command-options"]
+    Reference: ["mock-specification"]
   }
 };
