@@ -1,7 +1,3 @@
----
-title: oneshot
----
-
 # oneshot
 
 `oneshot` executes one GraphQL operation and prints the JSON response to stdout.
