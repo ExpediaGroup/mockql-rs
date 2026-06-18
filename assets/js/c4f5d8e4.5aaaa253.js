@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmockql_rs_docs=self.webpackChunkmockql_rs_docs||[]).push([[2634],{192(s,c,r){r.r(c),r.d(c,{default:()=>k});var o=r(6347),e=r(4848);function k(){return(0,e.jsx)(o.rd,{to:"/mockql-rs/docs"})}}}]);
