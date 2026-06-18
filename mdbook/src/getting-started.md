@@ -1,12 +1,3 @@
----
-id: getting-started
-title: Getting Started
-slug: /
----
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 # Getting Started
 
 MockQL (`mockql`) executes GraphQL operations that use `@mock` to ask an LLM provider for mocked response data. Depending on where `@mock` appears, MockQL can pass the operation through unchanged, generate the full response, or merge upstream data with mocked fields.
@@ -111,4 +102,4 @@ In this example, `mockql` chooses a `PartialMock` plan because `title` comes fro
 ### 6. Merge the responses
 Finally, `mockql` combines the upstream data with the generated mock data and returns one complete GraphQL response.
 
-![MockQL CLI infographic](/img/mockql-infograph.jpg)
+![MockQL CLI infographic](./img/mockql-infograph.jpg)

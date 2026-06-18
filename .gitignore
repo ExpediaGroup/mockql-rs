@@ -21,3 +21,4 @@ prompt.dbg.txt
 megalinter-reports/
 examples/**/*/mockql
 examples/**/*.tape
+mdbook/book

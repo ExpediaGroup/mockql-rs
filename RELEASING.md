@@ -7,3 +7,20 @@
 5. Publish the GitHub Release with a matching `v`-prefixed name and tag, for example `v0.2.0`.
 6. The `Release` GitHub Actions workflow runs automatically after the GitHub Release is published.
 7. The workflow builds release binaries, uploads release assets and checksums, then publishes the crates to crates.io
+
+## Versioned docs (major releases only)
+
+After the major release is published, archive the outgoing docs from its release tag. Example: `2.0.0` has just been published, archive v1:
+
+1. Trigger the `Publish Latest Docs` workflow from the outgoing release tag:
+   ```bash
+   gh workflow run publish-latest-docs.yml --ref v1.0.0 -f destination_dir=v1
+   ```
+   This builds docs from the `v1.0.0` tag and deploys them to `/mockql-rs/v1/`. `main` (now v2) is untouched.
+
+2. Add a link to the archive in `mdbook/src/SUMMARY.md`:
+   ```md
+   [v1 docs](../v1/)
+   ```
+
+3. The next push to `mdbook/**` on `main` redeploys the root with v2 content. The docs publish workflow checks the existing `gh-pages` branch and automatically preserves top-level `vN/` archives during root deploys.

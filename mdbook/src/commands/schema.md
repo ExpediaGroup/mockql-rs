@@ -1,7 +1,3 @@
----
-title: schema
----
-
 # schema
 
 `schema` prints a GraphQL schema decorated with the `@mock` directive. It does not use an LLM provider.

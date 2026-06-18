@@ -1,0 +1,11 @@
+[book]
+title = "MockQL Rust"
+description = "Directive-driven GraphQL response mocking via @mock"
+src = "src"
+
+[output.html]
+site-url = "/mockql-rs/"
+git-repository-url = "https://github.com/ExpediaGroup/mockql-rs"
+git-repository-icon = "fab-github"
+edit-url-template = "https://github.com/ExpediaGroup/mockql-rs/edit/main/mdbook/src/{path}"
+default-theme = "navy"
