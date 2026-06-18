@@ -7,7 +7,7 @@ name: Pull Request Check Documentation
     paths: ['mdbook/**']
 
 jobs:
-  publish-docs:
+  build-docs:
     permissions:
       contents: write
     timeout-minutes: 10
