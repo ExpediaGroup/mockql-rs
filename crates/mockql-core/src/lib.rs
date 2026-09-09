@@ -42,6 +42,7 @@ pub use graphql::mock_response_prompt::SCHEMA_EXTENSION_KEY;
 pub use graphql::mock_response_prompt::SerializationFormat;
 pub use graphql::response_merger::ResponseMerger;
 pub use graphql::response_merger::ResponseMergerError;
+pub use graphql::response_validator::ResponseValidationError;
 pub use graphql::schema_filter::SchemaFilter;
 pub use graphql::schema_filter::SchemaFilterError;
 pub use llm_provider::ProviderConfig;

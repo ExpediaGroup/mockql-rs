@@ -1,0 +1,16 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/normalizes_float_and_id_values.json
+---
+{
+  "data": {
+    "me": {
+      "id": "123"
+    },
+    "topProducts": [
+      {
+        "averageRating": 1.0
+      }
+    ]
+  }
+}

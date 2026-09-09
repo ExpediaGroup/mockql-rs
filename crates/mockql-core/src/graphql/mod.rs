@@ -14,6 +14,7 @@
 
 //! GraphQL-specific helpers used by the mock engine.
 
+pub(crate) mod abstract_typename_injector;
 /// Schema minification helpers for prompt generation.
 pub mod minify;
 /// `@mock` directive extraction and classification.
@@ -24,6 +25,8 @@ pub mod mock_response_prompt;
 pub mod operation_field_filter;
 /// Response merging helpers for combining upstream and mocked data.
 pub mod response_merger;
+/// Validation and projection of generated GraphQL response data.
+pub mod response_validator;
 /// Schema filtering helpers for producing prompt-local schemas.
 pub mod schema_filter;
 /// Core GraphQL request and response types.

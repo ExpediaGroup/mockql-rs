@@ -1,0 +1,9 @@
+{
+  "operation": "mutation { createProduct(upc: \"1\", name: \"Keyboard\") { id name } }",
+  "data": {
+    "createProduct": {
+      "id": "1",
+      "name": "Keyboard"
+    }
+  }
+}

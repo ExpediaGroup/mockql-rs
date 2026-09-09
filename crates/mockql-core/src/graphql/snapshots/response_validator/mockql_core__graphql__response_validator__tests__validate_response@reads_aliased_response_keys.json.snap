@@ -1,0 +1,11 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/reads_aliased_response_keys.json
+---
+{
+  "data": {
+    "currentUser": {
+      "displayName": "Ada Lovelace"
+    }
+  }
+}

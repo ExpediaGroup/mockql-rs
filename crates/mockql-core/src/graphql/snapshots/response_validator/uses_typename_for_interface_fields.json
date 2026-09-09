@@ -1,0 +1,10 @@
+{
+  "operation": "{ node(id: \"1\") { id ... on User { name } } }",
+  "data": {
+    "node": {
+      "__typename": "User",
+      "id": "1",
+      "name": "Ada Lovelace"
+    }
+  }
+}

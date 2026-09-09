@@ -1,0 +1,13 @@
+{
+  "operation": "{ me { id } topProducts { averageRating } }",
+  "data": {
+    "me": {
+      "id": 123
+    },
+    "topProducts": [
+      {
+        "averageRating": 1
+      }
+    ]
+  }
+}

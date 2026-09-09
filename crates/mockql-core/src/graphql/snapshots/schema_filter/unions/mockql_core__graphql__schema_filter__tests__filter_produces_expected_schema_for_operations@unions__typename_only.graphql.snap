@@ -3,8 +3,29 @@ source: crates/mockql-core/src/graphql/schema_filter.rs
 expression: "SCHEMA_FILTER.filter(&content,\noperation_name.as_deref()).expect(\"filter should succeed\")"
 input_file: crates/mockql-core/src/graphql/snapshots/schema_filter/unions/typename_only.graphql
 ---
+interface Node {
+  id: ID!
+  createdAt: String!
+}
+type Product implements Node & Reviewable {
+  id: ID!
+  upc: String!
+  weight: Int
+  price: Int
+  inStock: Boolean
+  shippingEstimate: Int
+  name: String
+  reviews: [Review]
+  reviewsForAuthor(authorID: ID!): [Review]
+  createdAt: String!
+  averageRating: Float
+}
 type Query {
   search(query: String!): [SearchResult]
+}
+interface Reviewable {
+  reviews: [Review]
+  averageRating: Float
 }
 union SearchResult = Product
 """

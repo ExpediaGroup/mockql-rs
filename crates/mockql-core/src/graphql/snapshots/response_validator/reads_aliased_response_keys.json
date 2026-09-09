@@ -1,0 +1,8 @@
+{
+  "operation": "{ currentUser: me { displayName: name } }",
+  "data": {
+    "currentUser": {
+      "displayName": "Ada Lovelace"
+    }
+  }
+}

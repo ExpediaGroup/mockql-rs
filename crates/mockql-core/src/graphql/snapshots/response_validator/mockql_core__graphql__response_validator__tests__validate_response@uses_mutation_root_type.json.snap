@@ -1,0 +1,12 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/uses_mutation_root_type.json
+---
+{
+  "data": {
+    "createProduct": {
+      "id": "1",
+      "name": "Keyboard"
+    }
+  }
+}

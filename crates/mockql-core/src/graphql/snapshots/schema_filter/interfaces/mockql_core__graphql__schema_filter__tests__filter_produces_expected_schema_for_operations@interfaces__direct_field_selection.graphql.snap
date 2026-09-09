@@ -10,6 +10,23 @@ scalar ID
 interface Node {
   id: ID!
 }
+type Product implements Node & Reviewable {
+  id: ID!
+  upc: String!
+  weight: Int
+  price: Int
+  inStock: Boolean
+  shippingEstimate: Int
+  name: String
+  reviews: [Review]
+  reviewsForAuthor(authorID: ID!): [Review]
+  createdAt: String!
+  averageRating: Float
+}
 type Query {
   node(id: ID!): Node
+}
+interface Reviewable {
+  reviews: [Review]
+  averageRating: Float
 }

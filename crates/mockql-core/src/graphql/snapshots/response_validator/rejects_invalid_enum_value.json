@@ -1,0 +1,8 @@
+{
+  "operation": "{ me { status } }",
+  "data": {
+    "me": {
+      "status": "OWNER"
+    }
+  }
+}

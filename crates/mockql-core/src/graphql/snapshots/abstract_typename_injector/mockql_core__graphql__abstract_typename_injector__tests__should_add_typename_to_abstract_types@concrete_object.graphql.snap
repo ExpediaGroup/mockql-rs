@@ -1,0 +1,10 @@
+---
+source: crates/mockql-core/src/graphql/abstract_typename_injector.rs
+input_file: crates/mockql-core/src/graphql/snapshots/abstract_typename_injector/concrete_object.graphql
+---
+{
+  me {
+    id
+    name
+  }
+}

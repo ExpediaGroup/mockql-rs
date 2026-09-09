@@ -20,6 +20,8 @@ use crate::graphql::mock_response_prompt::MockResponsePrompt;
 use crate::graphql::mock_response_prompt::SerializationFormat;
 use crate::graphql::response_merger::ResponseMerger;
 use crate::graphql::response_merger::ResponseMergerError;
+use crate::graphql::response_validator::ResponseValidationError;
+use crate::graphql::response_validator::ResponseValidator;
 use crate::llm_provider::ProviderConfig;
 use crate::llm_provider::ProviderError;
 use crate::llm_provider::generate_mock_response;
@@ -28,6 +30,7 @@ use crate::planner::SplitError;
 use crate::planner::SplitResult;
 use crate::upstream::UpstreamError;
 use crate::upstream::execute_graphql;
+use apollo_compiler::ExecutableDocument;
 use apollo_compiler::Schema;
 use apollo_compiler::response::ExecutionResponse;
 use apollo_compiler::validation::Valid;
@@ -37,7 +40,12 @@ use serde_json_bytes::ByteString;
 use serde_json_bytes::Map;
 use serde_json_bytes::Value;
 use std::sync::Arc;
+use std::time::Duration;
 use thiserror::Error;
+
+const MAX_VALIDATION_RETRIES: usize = 3;
+const MAX_PROVIDER_RETRIES: usize = 3;
+const PROVIDER_RETRY_DELAY: Duration = Duration::from_secs(1);
 
 /// Execution strategy selected for a request after planning.
 #[derive(Debug, Clone)]
@@ -62,10 +70,11 @@ impl From<SplitResult> for MockPlan {
     match split_result {
       SplitResult::NoMocks => MockPlan::NoMocks,
       SplitResult::Introspection(response) => MockPlan::Introspection(response),
-      SplitResult::FullMock(prompt) => MockPlan::FullMock(prompt),
+      SplitResult::FullMock { prompt, .. } => MockPlan::FullMock(prompt),
       SplitResult::PartialMock {
         prompt,
         upstream_operation,
+        ..
       } => MockPlan::PartialMock {
         prompt,
         upstream_operation,
@@ -140,6 +149,89 @@ pub enum ServiceError {
   /// Partial-response merging failed.
   #[error(transparent)]
   Merge(#[from] ResponseMergerError),
+  /// Generated response validation failed.
+  #[error(transparent)]
+  ResponseValidation(#[from] ResponseValidationError),
+}
+
+fn is_retryable_provider_error(error: &ProviderError) -> bool {
+  match error {
+    ProviderError::Http(error) => error.is_timeout() || error.is_connect() || error.is_body(),
+    ProviderError::UnexpectedStatus { status, .. } => {
+      *status == reqwest::StatusCode::REQUEST_TIMEOUT
+        || *status == reqwest::StatusCode::TOO_MANY_REQUESTS
+        || status.is_server_error()
+    }
+    _ => false,
+  }
+}
+
+async fn generate_and_validate_mock_response(
+  provider: &ProviderConfig,
+  mut prompt: MockResponsePrompt,
+  validator: &ResponseValidator,
+  document: &Valid<ExecutableDocument>,
+  operation_name: Option<&str>,
+  variables: &Map<ByteString, Value>,
+) -> Result<GraphQLResponse, ServiceError> {
+  let mut provider_retries = 0;
+  let mut validation_retries = 0;
+  loop {
+    let mut response = match generate_mock_response(provider, &prompt).await {
+      Ok(response) => response,
+      Err(error) if is_retryable_provider_error(&error) => {
+        if provider_retries >= MAX_PROVIDER_RETRIES {
+          return Err(error.into());
+        }
+
+        provider_retries += 1;
+        if std::env::var("MOCKQL_DEBUG").is_ok() {
+          eprintln!("provider failed; retrying ({provider_retries}/{MAX_PROVIDER_RETRIES}): {error}");
+        }
+        tokio::time::sleep(PROVIDER_RETRY_DELAY).await;
+        continue;
+      }
+      Err(error) => return Err(error.into()),
+    };
+    if std::env::var("MOCKQL_DEBUG").is_ok() {
+      eprintln!(
+        "LLM response: {}",
+        serde_json::to_string(&response).unwrap_or_else(|_| format!("{response:?}"))
+      );
+    }
+    let validation = response
+      .data
+      .as_ref()
+      .ok_or(ResponseValidationError::InvalidData)
+      .and_then(|data| validator.validate(document, operation_name, variables, data));
+
+    match validation {
+      Ok(data) => {
+        response.data = Some(data);
+        return Ok(response);
+      }
+      Err(error) => {
+        if validation_retries >= MAX_VALIDATION_RETRIES {
+          return Err(error.into());
+        }
+
+        let feedback = match &error {
+          ResponseValidationError::Execution(errors) => serde_json::to_string(errors)
+            .unwrap_or_else(|_| serde_json::json!({ "message": error.to_string() }).to_string()),
+          ResponseValidationError::InvalidData => serde_json::json!({ "message": error.to_string() }).to_string(),
+          ResponseValidationError::InvalidRequest(_) => return Err(error.into()),
+        };
+
+        validation_retries += 1;
+        if std::env::var("MOCKQL_DEBUG").is_ok() {
+          eprintln!(
+            "mock response validation failed; retrying ({validation_retries}/{MAX_VALIDATION_RETRIES}): {error}"
+          );
+        }
+        prompt = prompt.with_validation_feedback(feedback);
+      }
+    }
+  }
 }
 
 impl MockService {
@@ -169,7 +261,7 @@ impl MockService {
 
   /// Executes a request using upstream GraphQL, a mock provider, or both.
   pub async fn execute(&self, request: MockServiceRequest) -> Result<GraphQLResponse, ServiceError> {
-    let plan = self.plan(
+    let plan = self.planner.split_operation(
       request.operation.as_str(),
       request.operation_name.as_deref(),
       &request.variables,
@@ -177,7 +269,7 @@ impl MockService {
     )?;
 
     match plan {
-      MockPlan::Introspection(response) => Ok(GraphQLResponse {
+      SplitResult::Introspection(response) => Ok(GraphQLResponse {
         data: response.data.map(Value::Object),
         errors: response
           .errors
@@ -186,7 +278,7 @@ impl MockService {
           .collect(),
         extensions: Map::new(),
       }),
-      MockPlan::NoMocks => execute_graphql(
+      SplitResult::NoMocks => execute_graphql(
         &self.client,
         request.graphql_url,
         &request.graphql_headers,
@@ -196,11 +288,26 @@ impl MockService {
       )
       .await
       .map_err(ServiceError::from),
-      MockPlan::FullMock(prompt) => generate_mock_response(&request.provider, &prompt)
-        .await
-        .map_err(ServiceError::from),
-      MockPlan::PartialMock {
+      SplitResult::FullMock {
         prompt,
+        validator,
+        document,
+      } => {
+        generate_and_validate_mock_response(
+          &request.provider,
+          prompt,
+          &validator,
+          &document,
+          request.operation_name.as_deref(),
+          &request.variables,
+        )
+        .await
+      }
+      SplitResult::PartialMock {
+        prompt,
+        validator,
+        document,
+        original_document,
         upstream_operation: passthrough_operation,
       } => {
         let mut upstream_response = execute_graphql(
@@ -212,9 +319,31 @@ impl MockService {
           &request.variables,
         )
         .await?;
+        if upstream_response.data.as_ref().is_none_or(Value::is_null) {
+          return Ok(upstream_response);
+        }
         let contextual_prompt = prompt.with_partial_response(upstream_response.data.clone());
-        let mut mock_response = generate_mock_response(&request.provider, &contextual_prompt).await?;
+        let mut mock_response = generate_and_validate_mock_response(
+          &request.provider,
+          contextual_prompt,
+          &validator,
+          &document,
+          request.operation_name.as_deref(),
+          &request.variables,
+        )
+        .await?;
         ResponseMerger::merge(&mut upstream_response, &mut mock_response)?;
+        upstream_response.data = Some(
+          validator.validate(
+            &original_document,
+            request.operation_name.as_deref(),
+            &request.variables,
+            upstream_response
+              .data
+              .as_ref()
+              .ok_or(ResponseValidationError::InvalidData)?,
+          )?,
+        );
         Ok(upstream_response)
       }
     }
@@ -225,7 +354,6 @@ impl MockService {
 mod tests {
   use super::*;
   use serde_json_bytes::Map;
-  use std::time::Duration;
 
   fn test_service(schema_sdl: &str) -> MockService {
     let schema = Schema::builder()

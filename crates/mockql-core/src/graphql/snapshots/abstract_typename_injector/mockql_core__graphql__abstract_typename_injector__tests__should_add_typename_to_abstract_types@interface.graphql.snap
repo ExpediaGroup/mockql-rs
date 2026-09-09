@@ -1,0 +1,13 @@
+---
+source: crates/mockql-core/src/graphql/abstract_typename_injector.rs
+input_file: crates/mockql-core/src/graphql/snapshots/abstract_typename_injector/interface.graphql
+---
+{
+  node(id: "1") {
+    id
+    ... on User {
+      name
+    }
+    __typename
+  }
+}

@@ -1,0 +1,21 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/rejects_missing_required_field.json
+---
+{
+  "errors": [
+    {
+      "message": "non-null type ID! resolved to null",
+      "locations": [
+        {
+          "line": 1,
+          "column": 8
+        }
+      ],
+      "path": [
+        "me",
+        "id"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/response_fields_are_in_correct_order.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Ada Lovelace",
+      "createdAt": "2026-08-10T00:00:00Z"
+    }
+  }
+}

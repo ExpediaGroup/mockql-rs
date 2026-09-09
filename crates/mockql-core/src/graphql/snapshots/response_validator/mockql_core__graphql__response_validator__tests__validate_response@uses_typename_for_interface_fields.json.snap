@@ -1,0 +1,12 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/uses_typename_for_interface_fields.json
+---
+{
+  "data": {
+    "node": {
+      "id": "1",
+      "name": "Ada Lovelace"
+    }
+  }
+}

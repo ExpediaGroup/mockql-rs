@@ -1,0 +1,12 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/removes_unselected_fields.json
+---
+{
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Ada Lovelace"
+    }
+  }
+}
