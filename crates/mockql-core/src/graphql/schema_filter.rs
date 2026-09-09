@@ -271,9 +271,10 @@ impl<'a> SchemaFilterTraversal<'a> {
   ///
   /// **Unions**: `query { search { ... on Product { name } } }` where `search` returns `SearchResult`.
   /// Only union member types that are actually referenced (for example, via inline fragments like `... on Product`)
-  /// are included; other members of the union are not added unless referenced.
+  /// are included. If none are referenced, one member is retained as a valid `__typename` candidate.
   fn collect_transitive_dependencies(&mut self) {
     let mut to_process: Vec<String> = self.required_types.iter().cloned().collect();
+    let implementers = self.schema.implementers_map();
 
     while let Some(type_name) = to_process.pop() {
       let Some(type_def) = self.schema.types.get(type_name.as_str()) else {
@@ -289,6 +290,25 @@ impl<'a> SchemaFilterTraversal<'a> {
         ExtendedType::Interface(interface_type) => {
           for iface in &interface_type.implements_interfaces {
             self.add_type_if_new(iface, &mut to_process);
+          }
+          if let Some(possible_types) = implementers.get(type_name.as_str())
+            && !possible_types
+              .objects
+              .iter()
+              .any(|name| self.required_types.contains(name.as_str()))
+            && let Some(name) = possible_types.objects.iter().next()
+          {
+            self.add_type_if_new(name, &mut to_process);
+          }
+        }
+        ExtendedType::Union(union_type) => {
+          if !union_type
+            .members
+            .iter()
+            .any(|name| self.required_types.contains(name.as_str()))
+            && let Some(name) = union_type.members.iter().next()
+          {
+            self.add_type_if_new(name, &mut to_process);
           }
         }
         ExtendedType::InputObject(input) => {

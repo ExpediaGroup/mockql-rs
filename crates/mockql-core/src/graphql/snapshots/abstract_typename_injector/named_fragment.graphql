@@ -1,0 +1,9 @@
+query {
+  ...QueryFields
+}
+
+fragment QueryFields on Query {
+  node(id: "1") {
+    id
+  }
+}

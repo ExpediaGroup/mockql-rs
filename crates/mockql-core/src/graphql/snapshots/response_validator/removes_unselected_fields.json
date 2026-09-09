@@ -1,0 +1,10 @@
+{
+  "operation": "{ me { id name } }",
+  "data": {
+    "me": {
+      "id": "1",
+      "name": "Ada Lovelace",
+      "favoriteCompiler": "hallucinated"
+    }
+  }
+}

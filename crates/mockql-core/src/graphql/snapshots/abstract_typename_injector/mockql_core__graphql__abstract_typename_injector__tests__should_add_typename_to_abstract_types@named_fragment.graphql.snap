@@ -1,0 +1,14 @@
+---
+source: crates/mockql-core/src/graphql/abstract_typename_injector.rs
+input_file: crates/mockql-core/src/graphql/snapshots/abstract_typename_injector/named_fragment.graphql
+---
+{
+  ...QueryFields
+}
+
+fragment QueryFields on Query {
+  node(id: "1") {
+    id
+    __typename
+  }
+}

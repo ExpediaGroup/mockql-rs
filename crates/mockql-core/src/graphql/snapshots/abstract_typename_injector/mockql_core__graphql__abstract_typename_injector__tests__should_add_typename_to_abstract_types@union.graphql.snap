@@ -1,0 +1,12 @@
+---
+source: crates/mockql-core/src/graphql/abstract_typename_injector.rs
+input_file: crates/mockql-core/src/graphql/snapshots/abstract_typename_injector/union.graphql
+---
+{
+  search(query: "keyboard") {
+    ... on Product {
+      name
+    }
+    __typename
+  }
+}

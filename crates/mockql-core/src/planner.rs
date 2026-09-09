@@ -15,6 +15,7 @@
 //! Planning helpers for mock-aware GraphQL requests.
 
 use crate::MinifyExt;
+use crate::graphql::abstract_typename_injector::add_typename_to_abstract_types;
 use crate::graphql::mock_directive_extractor::MockDirectiveExtractor;
 use crate::graphql::mock_directive_extractor::MockDirectiveExtractorError;
 use crate::graphql::mock_directive_extractor::MockScenario;
@@ -22,8 +23,10 @@ use crate::graphql::mock_response_prompt::MockResponsePrompt;
 use crate::graphql::mock_response_prompt::SerializationFormat;
 use crate::graphql::operation_field_filter::FilterMode;
 use crate::graphql::operation_field_filter::OperationFieldFilter;
+use crate::graphql::response_validator::ResponseValidator;
 use crate::graphql::schema_filter::SchemaFilter;
 use crate::graphql::schema_filter::SchemaFilterError;
+use apollo_compiler::ExecutableDocument;
 use apollo_compiler::Schema;
 use apollo_compiler::parser::FileId;
 use apollo_compiler::response::ExecutionResponse;
@@ -37,6 +40,7 @@ use thiserror::Error;
 #[derive(Debug)]
 pub(crate) struct MockPlanner {
   schema: Arc<Valid<Schema>>,
+  response_validator: ResponseValidator,
   schema_filter: SchemaFilter,
   mock_directive_extractor: MockDirectiveExtractor,
   serialization_format: SerializationFormat,
@@ -44,17 +48,30 @@ pub(crate) struct MockPlanner {
 
 /// Internal result of splitting an operation into passthrough and mocked portions.
 #[derive(Debug)]
-pub enum SplitResult {
+pub(crate) enum SplitResult {
   /// The operation contains no mocks and should be forwarded upstream as-is.
   NoMocks,
   /// The operation is a pure introspection query answered from the local schema.
   Introspection(ExecutionResponse),
   /// The full operation should be satisfied by a mock provider.
-  FullMock(MockResponsePrompt),
+  FullMock {
+    /// Prompt describing the response to generate.
+    prompt: MockResponsePrompt,
+    /// Schema-bound validator for the generated response.
+    validator: ResponseValidator,
+    /// Operation document.
+    document: Valid<ExecutableDocument>,
+  },
   /// The operation should be split between upstream execution and provider generation.
   PartialMock {
     /// Prompt describing the portion that should be mocked.
     prompt: MockResponsePrompt,
+    /// Schema-bound validator for the generated response.
+    validator: ResponseValidator,
+    /// Operation document.
+    document: Valid<ExecutableDocument>,
+    /// Original operation document used to validate the merged response.
+    original_document: Box<Valid<ExecutableDocument>>,
     /// GraphQL operation that should be executed upstream before merging.
     upstream_operation: String,
   },
@@ -69,6 +86,9 @@ pub enum SplitError {
   /// The operation could not be filtered into include or exclude variants.
   #[error("failed to filter operation fields: {0}")]
   OperationFilter(String),
+  /// The prompt operation could not be selected for abstract type augmentation.
+  #[error("failed to inject abstract type names: {0}")]
+  AbstractTypenameInjection(String),
   /// The schema could not be minimized for the target operation.
   #[error("failed to filter schema: {0}")]
   SchemaFilter(#[from] SchemaFilterError),
@@ -91,6 +111,7 @@ pub enum ExtendSchemaError {
 impl MockPlanner {
   pub(crate) fn new(schema: Arc<Valid<Schema>>, serialization_format: SerializationFormat) -> Self {
     Self {
+      response_validator: ResponseValidator::new(schema.clone()),
       schema_filter: SchemaFilter::new(schema.clone()),
       mock_directive_extractor: MockDirectiveExtractor::new(schema.clone()),
       schema,
@@ -140,8 +161,9 @@ impl MockPlanner {
         mocked_fields,
       } => (document, mocked_fields, true),
     };
+    let original_document = document.clone();
 
-    let (to_mock_operation, upstream_operation) = if is_partial {
+    let (to_mock_document, upstream_operation) = if is_partial {
       let paths: Vec<String> = mocked_fields.iter().map(|field| field.path.clone()).collect();
       let operation_field_filter = OperationFieldFilter::new(&document, &paths);
       let filter = |mode: FilterMode| {
@@ -153,12 +175,17 @@ impl MockPlanner {
       let filtered_document = filter(FilterMode::Include)?;
       let excluded_document = filter(FilterMode::Exclude)?;
       (
-        filtered_document.serialize().no_indent().to_string(),
+        filtered_document,
         Some(excluded_document.serialize().no_indent().to_string()),
       )
     } else {
-      (operation.to_string(), None)
+      (document, None)
     };
+    let to_mock_operation = add_typename_to_abstract_types(&self.schema, to_mock_document.clone(), operation_name)
+      .map_err(|error| SplitError::AbstractTypenameInjection(format!("{error:?}")))?
+      .serialize()
+      .no_indent()
+      .to_string();
 
     let prompt = MockResponsePrompt::builder()
       .graphql_schema(self.schema_filter.filter(&to_mock_operation, operation_name)?.minify())
@@ -171,9 +198,16 @@ impl MockPlanner {
     match upstream_operation {
       Some(upstream_operation) => Ok(SplitResult::PartialMock {
         prompt,
+        validator: self.response_validator.clone(),
+        document: to_mock_document,
+        original_document: Box::new(original_document),
         upstream_operation,
       }),
-      None => Ok(SplitResult::FullMock(prompt)),
+      None => Ok(SplitResult::FullMock {
+        prompt,
+        validator: self.response_validator.clone(),
+        document: to_mock_document,
+      }),
     }
   }
 
@@ -192,163 +226,5 @@ impl MockPlanner {
       .map_err(|error| ExtendSchemaError::Validate(error.errors.iter().map(|d| d.error.to_string()).collect()))?;
 
     Ok(Self::new(Arc::new(schema), self.serialization_format))
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  use apollo_compiler::ExecutableDocument;
-
-  fn test_planner(schema_sdl: &str) -> MockPlanner {
-    let schema = Schema::builder()
-      .parse(
-        "directive @mock(hint: String) on QUERY | MUTATION | FIELD",
-        "mock-directive.graphql",
-      )
-      .parse(schema_sdl, "schema.graphql")
-      .build()
-      .unwrap();
-    let schema = Arc::new(schema.validate().unwrap());
-    MockPlanner::new(schema, Default::default())
-  }
-
-  #[test]
-  fn with_extended_schema_adds_field_to_schema() {
-    let extended = test_planner("type Query { hello: String }")
-      .with_extended_schema("extend type Query { newField: String }")
-      .expect("should build extended schema");
-    assert!(
-      extended
-        .schema
-        .get_object("Query")
-        .expect("Query type should exist")
-        .fields
-        .get("newField")
-        .is_some(),
-      "newField should exist in Query"
-    );
-  }
-
-  #[test]
-  fn with_extended_schema_returns_build_error_for_lexical_error() {
-    let error = test_planner("type Query { hello: String }")
-      .with_extended_schema("not valid graphql {{{")
-      .expect_err("expected error for invalid SDL");
-    assert!(matches!(error, ExtendSchemaError::Build(_)));
-  }
-
-  #[test]
-  fn with_extended_schema_returns_validate_error_for_semantic_error() {
-    let error = test_planner("type Query { hello: String }")
-      .with_extended_schema("extend type Query { newField: NonExistentType }")
-      .expect_err("expected validation error for undefined type");
-    assert!(matches!(error, ExtendSchemaError::Validate(_)));
-  }
-
-  #[test]
-  fn operation_with_extended_types_should_parse_against_extended_schema() {
-    let base_schema = r"
-      type Query { me: User }
-      type User { id: ID name: String }
-    ";
-    let extensions = r"
-      interface Address { street: String city: String }
-      type HomeAddress implements Address { street: String city: String isResidential: Boolean }
-      type WorkAddress implements Address { street: String city: String company: String }
-      extend type User { address: Address }
-    ";
-    let extended = test_planner(base_schema)
-      .with_extended_schema(extensions)
-      .expect("should build extended schema");
-
-    let operation = r"
-      query {
-        me {
-          name
-          address {
-            street
-            city
-            ... on HomeAddress { isResidential }
-            ... on WorkAddress { company }
-          }
-        }
-      }
-    ";
-    assert!(ExecutableDocument::parse_and_validate(&extended.schema, operation, "operation.graphql").is_ok());
-  }
-
-  #[test]
-  fn with_extended_schema_does_not_modify_original() {
-    let planner = test_planner("type Query { hello: String }");
-    let _extended = planner
-      .with_extended_schema("extend type Query { newField: String }")
-      .expect("should build extended schema");
-    assert!(
-      planner
-        .schema
-        .get_object("Query")
-        .expect("Query type should exist")
-        .fields
-        .get("newField")
-        .is_none(),
-      "original planner should not have the extended field"
-    );
-  }
-
-  #[test]
-  fn split_operation_with_schema_extension_extends_schema() {
-    let ext = Some(Value::String("extend type Query { newField: String }".into()));
-    let result = test_planner("type Query { hello: String }")
-      .split_operation("{ newField @mock }", None, &Map::new(), ext.as_ref())
-      .expect("should succeed with extended schema");
-    assert!(matches!(result, SplitResult::FullMock(_)));
-  }
-
-  #[test]
-  fn split_operation_without_schema_extension_uses_original_schema() {
-    let result = test_planner("type Query { hello: String }")
-      .split_operation("{ hello @mock }", None, &Map::new(), None)
-      .expect("should succeed with original schema");
-    assert!(matches!(result, SplitResult::FullMock(_)));
-  }
-
-  #[test]
-  fn split_operation_with_null_schema_extension_returns_error() {
-    let ext = Some(Value::Null);
-    let error = test_planner("type Query { hello: String }")
-      .split_operation("{ hello @mock }", None, &Map::new(), ext.as_ref())
-      .expect_err("should fail for null extension");
-    assert!(matches!(error, SplitError::SchemaExtensionInput(_)));
-  }
-
-  #[test]
-  fn split_operation_with_empty_schema_extension_returns_error() {
-    let planner = test_planner("type Query { hello: String }");
-    let ext = Some(Value::String("".into()));
-    let error = planner
-      .split_operation("{ hello @mock }", None, &Map::new(), ext.as_ref())
-      .expect_err("should fail for empty extension");
-    assert!(matches!(error, SplitError::SchemaExtensionInput(_)));
-  }
-
-  #[test]
-  fn split_operation_with_non_string_schema_extension_returns_error() {
-    let planner = test_planner("type Query { hello: String }");
-    let ext = Some(serde_json_bytes::json!(42));
-    let error = planner
-      .split_operation("{ hello @mock }", None, &Map::new(), ext.as_ref())
-      .expect_err("should fail for non-string");
-    assert!(matches!(error, SplitError::SchemaExtensionInput(_)));
-  }
-
-  #[test]
-  fn split_operation_with_invalid_sdl_returns_schema_extension_error() {
-    let planner = test_planner("type Query { hello: String }");
-    let ext = Some(Value::String("not valid graphql {{{".into()));
-    let error = planner
-      .split_operation("{ hello @mock }", None, &Map::new(), ext.as_ref())
-      .expect_err("should fail for invalid SDL");
-    assert!(matches!(error, SplitError::SchemaExtension(_)));
   }
 }

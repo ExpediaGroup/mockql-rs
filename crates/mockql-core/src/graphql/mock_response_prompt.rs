@@ -67,6 +67,8 @@ pub struct MockResponsePrompt {
   mocked_fields: Vec<MockedField>,
   #[serde(default)]
   partial_response: Option<Value>,
+  #[serde(default, skip_serializing_if = "Option::is_none")]
+  validation_feedback: Option<String>,
   #[serde(default)]
   format: SerializationFormat,
 }
@@ -119,6 +121,7 @@ impl MockResponsePrompt {
       variables,
       mocked_fields,
       partial_response: None,
+      validation_feedback: None,
       format,
     }
   }
@@ -128,6 +131,15 @@ impl MockResponsePrompt {
   pub fn with_partial_response(self, partial_response: Option<Value>) -> Self {
     Self {
       partial_response,
+      ..self
+    }
+  }
+
+  /// Returns a copy of the prompt augmented with validation feedback.
+  #[must_use]
+  pub fn with_validation_feedback(self, validation_feedback: String) -> Self {
+    Self {
+      validation_feedback: Some(validation_feedback),
       ..self
     }
   }
@@ -186,6 +198,26 @@ impl MockResponsePrompt {
       None => String::new(),
     };
 
+    let validation_feedback_section = self
+      .validation_feedback
+      .as_ref()
+      .map(|feedback| {
+        format!(
+          "### Validation Feedback\n\
+          The previous response failed validation. Generate a complete corrected response that fixes these errors:\n\
+          ```json\n{feedback}\n```"
+        )
+      })
+      .unwrap_or_default();
+    let optional_sections = match (
+      resolved_fields_section.is_empty(),
+      validation_feedback_section.is_empty(),
+    ) {
+      (true, _) => validation_feedback_section,
+      (_, true) => resolved_fields_section,
+      (false, false) => format!("{resolved_fields_section}\n{validation_feedback_section}"),
+    };
+
     Ok(render_prompt_template(
       prompt_template(),
       &[
@@ -193,7 +225,7 @@ impl MockResponsePrompt {
         ("__GRAPHQL_OPERATION__", &self.graphql_operation),
         ("__VARIABLES_BLOCK__", &variables_block),
         ("__MOCKED_FIELDS_BLOCK__", &mocked_fields_block),
-        ("__OPTIONAL_PARTIAL_RESPONSE_SECTION__", &resolved_fields_section),
+        ("__OPTIONAL_CONTEXT_SECTIONS__", &optional_sections),
         ("__MOCK_RESPONSE_EXT__", MOCK_RESPONSE_EXTENSION_KEY),
         ("__REASONING_EXT__", REASONING_KEY),
       ],
@@ -262,5 +294,26 @@ mod tests {
     insta::with_settings!({snapshot_path => "snapshots/mock_response_prompt"}, {
       insta::assert_snapshot!(serde_json::to_string_pretty(&extensions).unwrap());
     });
+  }
+
+  #[test]
+  fn to_markdown_includes_validation_feedback() {
+    let markdown = MockResponsePrompt::builder()
+      .graphql_schema("T:Query:me:User".to_string())
+      .graphql_operation("{ me { id } }".to_string())
+      .variables(Map::<ByteString, Value>::new())
+      .mocked_fields(vec![])
+      .format(SerializationFormat::Json)
+      .build()
+      .with_validation_feedback(r#"[{"message":"stale error"}]"#.into())
+      .with_validation_feedback(r#"[{"message":"non-null type ID! resolved to null","path":["me","id"]}]"#.into())
+      .to_markdown()
+      .expect("markdown generation should succeed");
+
+    assert!(
+      markdown.contains(
+        "### Validation Feedback\nThe previous response failed validation. Generate a complete corrected response that fixes these errors:\n```json\n[{\"message\":\"non-null type ID! resolved to null\",\"path\":[\"me\",\"id\"]}]\n```"
+      ) && !markdown.contains("stale error")
+    );
   }
 }

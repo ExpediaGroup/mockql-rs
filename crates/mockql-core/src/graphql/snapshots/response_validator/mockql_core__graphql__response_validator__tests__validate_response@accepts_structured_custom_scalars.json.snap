@@ -1,0 +1,19 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/accepts_structured_custom_scalars.json
+---
+{
+  "data": {
+    "config": {
+      "theme": "dark"
+    },
+    "configs": [
+      [
+        "compact"
+      ],
+      {
+        "theme": "light"
+      }
+    ]
+  }
+}

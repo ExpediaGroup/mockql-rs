@@ -1,0 +1,11 @@
+---
+source: crates/mockql-core/src/graphql/abstract_typename_injector.rs
+input_file: crates/mockql-core/src/graphql/snapshots/abstract_typename_injector/aliased_typename.graphql
+---
+{
+  node(id: "1") {
+    kind: __typename
+    id
+    __typename
+  }
+}

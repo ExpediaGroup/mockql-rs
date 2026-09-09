@@ -11,8 +11,25 @@ interface Node {
   id: ID!
   createdAt: String!
 }
+type Product implements Node & Reviewable {
+  id: ID!
+  upc: String!
+  weight: Int
+  price: Int
+  inStock: Boolean
+  shippingEstimate: Int
+  name: String
+  reviews: [Review]
+  reviewsForAuthor(authorID: ID!): [Review]
+  createdAt: String!
+  averageRating: Float
+}
 type Query {
   node(id: ID!): Node
+}
+interface Reviewable {
+  reviews: [Review]
+  averageRating: Float
 }
 """
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.

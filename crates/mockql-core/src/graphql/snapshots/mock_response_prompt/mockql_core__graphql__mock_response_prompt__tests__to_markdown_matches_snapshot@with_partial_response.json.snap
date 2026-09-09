@@ -37,7 +37,7 @@ Mock data rules:
    - When the operation uses inline fragments on a union/interface, choose `__typename` ONLY from the fragment-covered types.
    - If multiple fragment-covered types exist, pick one that best matches the hint/domain.
    - Do not invent union members not present in the operation fragments.
-   - If no fragment-covered concrete types are available, use the interface name as a fallback `__typename`.
+   - If no fragment-covered concrete types are available, choose a concrete type allowed by the schema.
 4. Enums:
    - Use only values allowed by the schema.
    - Prefer values consistent with Variables and hint/domain.

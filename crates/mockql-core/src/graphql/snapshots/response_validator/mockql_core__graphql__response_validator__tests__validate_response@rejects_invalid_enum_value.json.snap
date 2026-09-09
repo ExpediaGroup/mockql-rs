@@ -1,0 +1,21 @@
+---
+source: crates/mockql-core/src/graphql/response_validator.rs
+input_file: crates/mockql-core/src/graphql/snapshots/response_validator/rejects_invalid_enum_value.json
+---
+{
+  "errors": [
+    {
+      "message": "resolver returned \"OWNER\", expected enum UserStatus",
+      "locations": [
+        {
+          "line": 1,
+          "column": 8
+        }
+      ],
+      "path": [
+        "me",
+        "status"
+      ]
+    }
+  ]
+}

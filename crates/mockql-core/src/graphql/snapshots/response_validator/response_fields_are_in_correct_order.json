@@ -1,0 +1,10 @@
+{
+  "operation": "{ me { id name createdAt } }",
+  "data": {
+    "me": {
+      "createdAt": "2026-08-10T00:00:00Z",
+      "name": "Ada Lovelace",
+      "id": "1"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+query {
+  node(id: "1") {
+    kind: __typename
+    id
+  }
+}

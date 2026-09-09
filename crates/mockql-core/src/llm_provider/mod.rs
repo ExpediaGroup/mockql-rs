@@ -74,9 +74,6 @@ pub enum ProviderError {
   /// The provider returned invalid JSON.
   #[error("provider returned invalid JSON: {0}")]
   InvalidJson(#[from] serde_json::Error),
-  /// The provider response was not a GraphQL response object.
-  #[error("provider response must be a GraphQL object")]
-  InvalidGraphQLResponse,
 }
 
 /// Dispatches a mock response prompt to a provider.

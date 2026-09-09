@@ -1,0 +1,14 @@
+{
+  "operation": "{ config configs }",
+  "data": {
+    "config": {
+      "theme": "dark"
+    },
+    "configs": [
+      ["compact"],
+      {
+        "theme": "light"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+# operation_name: Mocked
+query Mocked {
+  ...MockedFields
+}
+
+query Unmocked {
+  ...UnmockedFields
+}
+
+fragment MockedFields on Query {
+  node(id: "1") {
+    id
+  }
+}
+
+fragment UnmockedFields on Query {
+  search(query: "keyboard") {
+    ... on Product {
+      name
+    }
+  }
+}
