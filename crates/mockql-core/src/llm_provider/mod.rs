@@ -86,3 +86,56 @@ pub async fn generate_mock_response(
     ProviderConfig::Http { provider, client } => provider.run(prompt, client).await,
   }
 }
+
+/// Parses a `GraphQLResponse` from raw LLM text, tolerating markdown fences, leading prose, and trailing junk.
+pub(crate) fn parse_llm_json(raw: &str) -> Result<GraphQLResponse, ProviderError> {
+  let trimmed = raw.trim();
+  if let Ok(response) = GraphQLResponse::try_from(trimmed) {
+    return Ok(response);
+  }
+
+  // ponytail: O(n) scan over `{` candidates; avoids latching onto non-GraphQL `{...}` in prose
+  let mut first_err = None;
+  for (idx, _) in trimmed.match_indices('{') {
+    match serde_json::Deserializer::from_str(&trimmed[idx..])
+      .into_iter::<GraphQLResponse>()
+      .next()
+    {
+      Some(Ok(response)) if response.data.is_some() || !response.errors.is_empty() => return Ok(response),
+      Some(Err(err)) if first_err.is_none() => first_err = Some(err),
+      _ => {}
+    }
+  }
+
+  Err(ProviderError::InvalidJson(
+    first_err.unwrap_or_else(|| GraphQLResponse::try_from(trimmed).unwrap_err()),
+  ))
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn parse_llm_json_handles_clean_fenced_prose_and_trailing() {
+    let cases = [
+      r#"{"data":{"ok":true}}"#,
+      "```json\n{\"data\":{\"ok\":true}}\n```",
+      "Here is the {example} output:\n{\"data\":{\"ok\":true}}\nHope that helps!",
+      "{\"data\":{\"ok\":true}}} trailing",
+    ];
+    for raw in cases {
+      let resp = parse_llm_json(raw).unwrap_or_else(|e| panic!("failed on {raw:?}: {e}"));
+      assert_eq!(resp.data.unwrap()["ok"], true);
+    }
+  }
+
+  #[test]
+  fn parse_llm_json_rejects_invalid_json() {
+    assert!(matches!(parse_llm_json("not json"), Err(ProviderError::InvalidJson(_))));
+    assert!(matches!(
+      parse_llm_json("{\"data\":{\"ok\":"),
+      Err(ProviderError::InvalidJson(_))
+    ));
+  }
+}

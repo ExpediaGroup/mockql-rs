@@ -47,7 +47,8 @@ impl GeminiCompatibleHttpProvider {
         "contents": [{
           "role": "user",
           "parts": [{ "text": prompt.to_markdown()? }]
-        }]
+        }],
+        "generationConfig": { "responseMimeType": "application/json" }
       }))
       .send()
       .await?;
@@ -78,7 +79,7 @@ impl GeminiCompatibleHttpProvider {
       })
       .ok_or(ProviderError::MalformedResponse("candidates[0].content.parts[0].text"))?;
 
-    GraphQLResponse::try_from(content.trim()).map_err(ProviderError::InvalidJson)
+    crate::llm_provider::parse_llm_json(content)
   }
 }
 

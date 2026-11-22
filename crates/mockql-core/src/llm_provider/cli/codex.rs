@@ -113,7 +113,7 @@ impl CodexCliProvider {
         "Codex CLI returned an empty last-message output".to_string(),
       ));
     }
-    GraphQLResponse::try_from(trimmed).map_err(ProviderError::InvalidJson)
+    crate::llm_provider::parse_llm_json(trimmed)
   }
 }
 

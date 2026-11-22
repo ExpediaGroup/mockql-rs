@@ -114,7 +114,7 @@ impl ClaudeCliProvider {
       .filter(|value| !value.is_empty())
       .ok_or_else(|| ProviderError::Request("Claude CLI JSON output did not contain a result".to_string()))?;
 
-    GraphQLResponse::try_from(result).map_err(ProviderError::InvalidJson)
+    crate::llm_provider::parse_llm_json(result)
   }
 
   fn is_error(payload: &Value) -> bool {
