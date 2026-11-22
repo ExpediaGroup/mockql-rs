@@ -43,6 +43,7 @@ impl GithubCopilotHttpProvider {
       .header("Content-Type", "application/json")
       .json(&json!({
         "model": self.model,
+        "response_format": { "type": "json_object" },
         "messages": [{ "role": "user", "content": prompt.to_markdown()? }],
         "stream": false
       }))
@@ -70,8 +71,7 @@ impl GithubCopilotHttpProvider {
       .and_then(|content| content.as_str())
       .ok_or(ProviderError::MalformedResponse("choices[0].message.content"))?;
 
-    let trimmed = content.trim();
-    GraphQLResponse::try_from(trimmed).map_err(ProviderError::InvalidJson)
+    crate::llm_provider::parse_llm_json(content)
   }
 }
 

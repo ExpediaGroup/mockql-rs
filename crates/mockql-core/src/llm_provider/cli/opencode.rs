@@ -60,7 +60,7 @@ impl OpenCodeCliProvider {
     if trimmed.is_empty() {
       return Err(ProviderError::Request("OpenCode CLI returned empty output".to_string()));
     }
-    GraphQLResponse::try_from(trimmed).map_err(ProviderError::InvalidJson)
+    crate::llm_provider::parse_llm_json(trimmed)
   }
 }
 

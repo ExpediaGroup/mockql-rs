@@ -16,6 +16,7 @@ mod oneshot;
 mod proxy;
 mod schema;
 mod shared;
+mod upgrade;
 
 pub(super) use self::oneshot::OneshotArgs;
 pub(super) use self::oneshot::exec_oneshot;
@@ -23,3 +24,5 @@ pub(super) use self::proxy::ProxyArgs;
 pub(super) use self::proxy::exec_proxy;
 pub(super) use self::schema::SchemaArgs;
 pub(super) use self::schema::exec_schema;
+pub(super) use self::upgrade::UpgradeArgs;
+pub(super) use self::upgrade::exec_upgrade;

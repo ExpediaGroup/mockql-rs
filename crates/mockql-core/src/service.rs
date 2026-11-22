@@ -191,6 +191,21 @@ async fn generate_and_validate_mock_response(
         tokio::time::sleep(PROVIDER_RETRY_DELAY).await;
         continue;
       }
+      Err(error @ ProviderError::InvalidJson(_)) => {
+        if validation_retries >= MAX_VALIDATION_RETRIES {
+          return Err(error.into());
+        }
+
+        validation_retries += 1;
+        if std::env::var("MOCKQL_DEBUG").is_ok() {
+          eprintln!(
+            "provider returned invalid JSON; retrying ({validation_retries}/{MAX_VALIDATION_RETRIES}): {error}"
+          );
+        }
+        let feedback = serde_json::json!({ "message": error.to_string() }).to_string();
+        prompt = prompt.with_validation_feedback(feedback);
+        continue;
+      }
       Err(error) => return Err(error.into()),
     };
     if std::env::var("MOCKQL_DEBUG").is_ok() {

@@ -129,8 +129,10 @@ binary_path="${tmpdir}/mockql-rs-${version}-${target}/${binary}"
 [ -f "${binary_path}" ] || fail "release archive did not contain ${binary}"
 
 mkdir -p "${destination}"
-cp "${binary_path}" "${destination}/${binary}"
-chmod 755 "${destination}/${binary}"
+tmp_dest="${destination}/.${binary}.tmp.$$"
+cp "${binary_path}" "${tmp_dest}"
+chmod 755 "${tmp_dest}"
+mv -f "${tmp_dest}" "${destination}/${binary}"
 
 say "Installed ${binary} to ${destination}/${binary}"
 
