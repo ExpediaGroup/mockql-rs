@@ -21,9 +21,11 @@ mod commands;
 use crate::commands::OneshotArgs;
 use crate::commands::ProxyArgs;
 use crate::commands::SchemaArgs;
+use crate::commands::UpgradeArgs;
 use crate::commands::exec_oneshot;
 use crate::commands::exec_proxy;
 use crate::commands::exec_schema;
+use crate::commands::exec_upgrade;
 use clap::Parser;
 use clap::Subcommand;
 use mockql_core::SchemaFilterError;
@@ -47,6 +49,8 @@ enum Commands {
   Proxy(ProxyArgs),
   #[command(about = "Print a GraphQL schema decorated with the mock directive")]
   Schema(SchemaArgs),
+  #[command(about = "Upgrade mockql to the latest release")]
+  Upgrade(UpgradeArgs),
 }
 
 #[derive(Debug, Error)]
@@ -73,6 +77,7 @@ async fn main() -> ExitCode {
     Commands::Oneshot(args) => exec_oneshot(args).await,
     Commands::Proxy(args) => exec_proxy(args).await,
     Commands::Schema(args) => exec_schema(args).await,
+    Commands::Upgrade(args) => exec_upgrade(args).await,
   };
   match result {
     Ok(()) => ExitCode::SUCCESS,
