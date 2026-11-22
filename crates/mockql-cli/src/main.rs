@@ -35,7 +35,7 @@ use std::process::ExitCode;
 use thiserror::Error;
 
 #[derive(Debug, Parser)]
-#[command(name = "mockql", about = "AI Generated GraphQL response mocking via @mock")]
+#[command(name = "mockql", version, about = "AI Generated GraphQL response mocking via @mock")]
 struct MockQLCli {
   #[command(subcommand)]
   command: Commands,
